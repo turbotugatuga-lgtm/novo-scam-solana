@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🐢 Turbo Tuga - Scam Detector</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🐢 Turbo Tuga - Scam Detector</h1>
+  <p>Paste the token mint address (SPL on Solana) and generate a full risk analysis report.</p>
+
+  <input type="text" id="mint" placeholder="Enter token mint address">
+  <button onclick="generateReport()">🔍 Generate Report</button>
+
+  <div id="report"></div>
+
+  <div class="actions">
+    <button onclick="exportPDF()">📄 Export PDF</button>
+    <button onclick="shareReport()">📢 Share Report</button>
+    <a class="btn" href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">🛒 Buy on Orca</a>
+    <a class="btn" href="https://jup.ag/swap/So11111111111111111111111111111111111111112-9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ" target="_blank">🛒 Buy on Jupiter</a>
+    <a class="btn" href="solana:SeuWalletDeDoacaoAqui?amount=1" target="_blank">💸 Donate</a>
+  </div>
+
+  <p class="disclaimer">
+    ⚠️ This analysis is automated and for educational purposes only.  
+    It is not financial advice. Always DYOR (do your own research).
+  </p>
+
+  <footer>
+    © Turbo Tuga Detector — Powered by Solana APIs (Shyft + Solscan)
+  </footer>
+
+  <!-- JS Files -->
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
