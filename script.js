@@ -18,7 +18,8 @@ async function generateReport() {
     freezeAuthority: "N/A",
     price: "N/A",
     volume24h: "N/A",
-    liquidity: "N/A"
+    liquidity: "N/A",
+    marketCap: "N/A"
   };
 
   try {
@@ -36,44 +37,68 @@ async function generateReport() {
       report.decimals = d.decimals || "N/A";
       report.mintAuthority = d.mint_authority || "Revoked";
       report.freezeAuthority = d.freeze_authority || "None";
+      report.holders = d.holder || "N/A";
     }
 
-    // --- Birdeye (market data, optional if key exists) ---
+    // --- Birdeye (market data, optional) ---
     if (birdeyeKey) {
       const beRes = await fetch(
-        `https://public-api.birdeye.so/defi/token_price?address=${mint}`,
+        `https://public-api.birdeye.so/defi/token_overview?address=${mint}`,
         { headers: { "X-API-KEY": birdeyeKey } }
       );
       const beData = await beRes.json();
       if (beData.success && beData.data) {
-        report.price = beData.data.value || "N/A";
+        report.price = beData.data.price || "N/A";
+        report.volume24h = beData.data.volume24h || "N/A";
+        report.liquidity = beData.data.liquidity || "N/A";
+        report.marketCap = beData.data.mc || "N/A";
       }
     }
 
-// --- Jupiter (price fallback) ---
-try {
-  const jupRes = await fetch(`https://price.jup.ag/v4/price?ids=${mint}`);
-  const jupData = await jupRes.json();
-  if (jupData.data && jupData.data[mint]) {
-    report.price = jupData.data[mint].price || report.price;
-  }
-} catch (e) {
-  console.warn("Jupiter price fetch failed", e);
-}
+    // --- Jupiter fallback ---
+    try {
+      const jupRes = await fetch(`https://price.jup.ag/v4/price?ids=${mint}`);
+      const jupData = await jupRes.json();
+      if (jupData.data && jupData.data[mint]) {
+        report.price = jupData.data[mint].price || report.price;
+      }
+    } catch (e) {
+      console.warn("Jupiter price fetch failed", e);
+    }
+
+    // --- Risk Score simples ---
+    let score = 65;
+    if (report.mintAuthority !== "Revoked") score -= 20;
+    if (report.freezeAuthority !== "None") score -= 10;
+    if (report.holders !== "N/A" && report.holders < 50) score -= 20;
+    if (report.liquidity === "N/A" || report.liquidity < 1000) score -= 15;
+
+    let riskMsg = "⚠️ Medium risk — caution advised";
+    let riskEmoji = "😐";
+    if (score < 40) {
+      riskMsg = "❌ High risk — possible scam!";
+      riskEmoji = "😭";
+    } else if (score > 80) {
+      riskMsg = "✅ Low risk — safer token";
+      riskEmoji = "🚀";
+    }
 
     // --- Render ---
     document.getElementById("report").innerHTML = `
       <h2>Token Report</h2>
       <p><b>${report.name} (${report.symbol})</b></p>
       <p><b>Mint:</b> ${mint}</p>
-      <p><b>Score:</b> 65/100</p>
+      <p><b>Score:</b> ${score}/100</p>
       <p><b>Price:</b> ${report.price}</p>
       <p><b>24h Volume:</b> ${report.volume24h}</p>
       <p><b>Liquidity:</b> ${report.liquidity}</p>
+      <p><b>Market Cap:</b> ${report.marketCap}</p>
       <p><b>Supply / Decimals:</b> ${report.supply} / ${report.decimals}</p>
+      <p><b>Holders:</b> ${report.holders}</p>
       <p><b>Mint authority:</b> ${report.mintAuthority}</p>
       <p><b>Freeze authority:</b> ${report.freezeAuthority}</p>
-      <p>⚠️ Risk thermometer: Medium risk — caution advised</p>
+      <p>${riskMsg}</p>
+      <div class="emoji">${riskEmoji}</div>
       <hr>
       <button onclick="exportPDF()">📄 Export PDF</button>
       <button onclick="shareReport()">📢 Share Report</button>
