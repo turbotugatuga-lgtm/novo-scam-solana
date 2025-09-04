@@ -1,13 +1,13 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
   margin: 0;
   padding: 0;
   text-align: center;
-  background: #f4f6f8;
+  background: linear-gradient(to right, #ffe259, #ffa751);
 }
 
 .topbar {
-  background: #111;
+  background: #222;
   padding: 10px;
   position: fixed;
   top: 0;
@@ -22,25 +22,62 @@ body {
   color: #fff;
   text-decoration: none;
   font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #ff3c3c;
+  transition: 0.3s;
+}
+
+.topbar a:hover {
+  background: #ff8080;
 }
 
 main {
-  margin-top: 70px;
+  margin-top: 80px;
   padding: 20px;
 }
 
 #report {
   margin-top: 20px;
   padding: 20px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   text-align: left;
 }
 
+#reportContent h2 {
+  text-align: center;
+  color: #ff3c3c;
+}
+
 .meme {
-  margin-top: 15px;
+  margin-top: 10px;
   max-width: 200px;
   display: block;
 }
 
+.table-score {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.table-score th, .table-score td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.table-score th {
+  background-color: #ff3c3c;
+  color: white;
+}
+
+.score-badge {
+  font-weight: bold;
+  color: #222;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background: #ffd700;
+}
