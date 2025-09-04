@@ -1,46 +1,322 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Turbo Tuga Token Analyzer</title>
-<link rel="stylesheet" href="styles.css" />
-<!-- Solana Web3 IIFE -->
-<script src="https://unpkg.com/@solana/web3.js@1.87.6/lib/index.iife.js"></script>
-<!-- jsPDF para exportar relatório -->
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Turbo Tuga — Scam Analyzer (Solana)</title>
+  <style>
+    /* simples, divertido e responsivo */
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#98a8c7;--accent:#67e8f9;--glass:rgba(255,255,255,0.04)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#071029 0%,#071b2f 100%);color:#e6f0ff}
+    header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent);backdrop-filter:blur(6px)}
+    .brand{font-weight:800;display:flex;gap:10px;align-items:center}
+    .brand .logo{font-size:20px}
+    nav a{color:var(--accent);text-decoration:none;margin-left:12px;font-weight:700}
+    .container{max-width:980px;margin:28px auto;padding:0 16px}
+    .panel{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+    h1{margin:0 0 8px;font-size:20px}
+    .controls{display:flex;gap:8px;margin-bottom:10px}
+    input{flex:1;padding:12px;border-radius:10px;border:1px solid #1a2a44;background:transparent;color:inherit}
+    button{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(180deg,var(--accent),#3fd1e8);color:#052026;font-weight:700;cursor:pointer}
+    .rpc{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .badge{padding:6px 10px;border-radius:999px;background:#07192a;color:var(--muted);font-size:13px}
+    #report{margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.015),transparent)}
+    .row{display:grid;grid-template-columns:1fr 160px;gap:12px;align-items:start}
+    .kv{display:flex;justify-content:space-between;padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    .logo-img{width:120px;height:120px;border-radius:12px;object-fit:cover;border:1px solid rgba(255,255,255,0.04)}
+    .meme{max-width:200px;border-radius:10px;margin-top:10px}
+    .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .small{font-size:13px;color:var(--muted)}
+    .score{font-weight:800;font-size:18px;color:var(--accent)}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
+    th{color:var(--muted);font-weight:700}
+    .pass{color:#9ff6c9}
+    .fail{color:#ff9aa2}
+    .neutral{color:var(--muted)}
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+    @media(max-width:720px){.row{grid-template-columns:1fr}.logo-img{width:84px;height:84px}}
+  </style>
 </head>
 <body>
-<header class="topbar">
-<div class="brand">🐢 Turbo Tuga Analyzer</div>
-<nav>
-<a href="https://app.orca.so" target="_blank">🐬 Comprar na Orca</a>
-<a href="https://jup.ag" target="_blank">🚀 Comprar na Jupiter</a>
-<a href="https://solscan.io/account/2NERt9zLBG2tKbcPXwfBYsRrPhFMVAxpR6ajfeEWeJSB" target="_blank">❤️ Doar</a>
-</nav>
-</header>
+  <header>
+    <div class="brand"><div class="logo">🐢</div><div>Turbo Tuga — Scam Analyzer</div></div>
+    <nav>
+      <!-- Links para comprar o token Turbo Tuga (substitua o MINT pelo seu mint real se quiser) -->
+      <a id="linkOrca" href="#" target="_blank">🐬 Orca</a>
+      <a id="linkJup" href="#" target="_blank">🚀 Jupiter</a>
+    </nav>
+  </header>
 
+  <main class="container">
+    <section class="panel">
+      <h1>Raio-X divertido de tokens (rede Solana)</h1>
+      <div class="controls">
+        <input id="mint" placeholder="Cole o mint address do token SPL (ex: So111... para SOL wrapped)" />
+        <button id="go">Analisar</button>
+      </div>
+      <div class="rpc"><div id="rpcBadge" class="badge">RPC: —</div><button id="swapRpc" class="small">Trocar RPC</button></div>
+      <div id="report">Cole um mint e clique em "Analisar" — o relatório aparecerá aqui com memes, score e detalhes.</div>
+    </section>
+  </main>
 
-<main class="container">
-<section class="panel">
-<h1>🔍 Token Analyzer</h1>
-<div class="controls">
-<input id="tokenInput" type="text" placeholder="Cole o mint address do token SPL" />
-<button id="btnReport">Gerar Relatório</button>
-</div>
-<div class="rpc-line">
-<span id="rpcStatus" class="badge">RPC: —</span>
-<button id="btnSwitchRpc" class="link">Trocar RPC</button>
-</div>
-<div id="hint" class="hint">Ex.: So11111111111111111111111111111111111111112 (SOL wrapped)</div>
-<div id="report" class="card"></div>
-</section>
-</main>
+  <footer>Feito com 💚 pela comunidade Turbo Tuga — Divirta-se e pesquise com responsabilidade</footer>
 
+<script>
+// ======== Configuração ========
+const DEFAULT_TURBO_MINT = 'TurboTugaMintPlaceholder0000000000000000000000'; // substitua se quiser
+// lista robusta de RPCs públicos (fallback)
+const RPCS = [
+  'https://solana-api.projectserum.com',
+  'https://rpc.ankr.com/solana',
+  'https://solana-mainnet.public.blastapi.io',
+  'https://api.mainnet-beta.solana.com' // último porque costuma 403 por CORS
+];
+let activeRpcIndex = 0;
 
-<footer class="footer">Feito pela comunidade Turbo Tuga 🐢🚀</footer>
+// grande banco de memes/GIFs (varie a cada busca)
+const MEMES = [
+  'https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif',
+  'https://media.giphy.com/media/l0HlOvJ7yaacpuSas/giphy.gif',
+  'https://media.giphy.com/media/3oEduSbSGpGaRX2Vri/giphy.gif',
+  'https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif',
+  'https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif',
+  'https://media.giphy.com/media/xT0GqeSlGSRQutnWHe/giphy.gif',
+  'https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif',
+  'https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif',
+  'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
+  'https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif',
+  'https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif',
+  'https://media.giphy.com/media/3o6ZsYQGQXUQ1qH4Ew/giphy.gif',
+  'https://media.giphy.com/media/3oEduSbSGpGaRX2Vri/giphy.gif',
+  'https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif',
+  'https://media.giphy.com/media/3ohs4BSacFKI7A717y/giphy.gif',
+  'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif',
+  'https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif',
+  'https://media.giphy.com/media/3o7TKtnuHOHHUjR38Y/giphy.gif',
+  'https://media.giphy.com/media/ASd0Ukj0y3qMM/giphy.gif'
+];
 
+// ======== Solana Web3 (IIFE bundle) ========
+// vamos injetar dinamicamente a lib (unpkg) para evitar dependências no servidor
+function loadScript(url){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=url;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
 
-<script src="script.js"></script>
+// util
+function short(s){if(!s) return ''; return s.length>18? s.slice(0,8)+'…'+s.slice(-8):s}
+function maybeLink(u){return u && u!=='N/A' ? `<a href="${u}" target="_blank">${u}</a>` : 'N/A' }
+
+async function init(){
+  try{
+    await loadScript('https://unpkg.com/@solana/web3.js@1.87.6/lib/index.iife.js');
+  }catch(e){console.error('Falha ao carregar web3',e);}
+  setRpcBadge();
+}
+init();
+
+function setRpcBadge(){const el=document.getElementById('rpcBadge');el.textContent = 'RPC: '+RPCS[activeRpcIndex];}
+
+document.getElementById('swapRpc').addEventListener('click',()=>{
+  activeRpcIndex = (activeRpcIndex+1)%RPCS.length; setRpcBadge();
+  alert('RPC trocado para: '+RPCS[activeRpcIndex]);
+});
+
+// monta links de compra (Orca/Jupiter) com placeholder do Turbo Tuga
+function buildDexLinks(mint){
+  // Orca: app.orca.so/?token=... (link simples)
+  const orca = `https://app.orca.so/pool/${mint}`; // heurística (pode não abrir direto se formato diferente)
+  const jup = `https://jup.ag/swap?inputMint=&outputMint=${mint}`;
+  document.getElementById('linkOrca').href = orca;
+  document.getElementById('linkJup').href = jup;
+}
+
+async function analyze(){
+  const mintRaw = document.getElementById('mint').value.trim();
+  const mint = mintRaw || DEFAULT_TURBO_MINT;
+  buildDexLinks(mint);
+  const rpc = RPCS[activeRpcIndex];
+  const connection = new solanaWeb3.Connection(rpc, 'confirmed');
+
+  const reportEl = document.getElementById('report');
+  reportEl.innerHTML = '<div class="small">Conectando ao RPC e coletando dados…</div>';
+
+  try{
+    // fetch token supply
+    const mintPub = new solanaWeb3.PublicKey(mint);
+    const supply = await connection.getTokenSupply(mintPub);
+    const supplyStr = supply?.value?.uiAmountString ?? 'N/A';
+    const decimals = supply?.value?.decimals ?? 'N/A';
+
+    // largest holders
+    const largest = await connection.getTokenLargestAccounts(mintPub);
+    const largestVals = await Promise.all(largest.value.map(async a=>({pubkey:a.address, amount:a.uiAmountString||a.amount})));    
+
+    // percent top holders (requer numeric)
+    let top1 = 0, top5 = 0;
+    try{
+      const total = Number(supply.value.uiAmount || supply.value.amount || 0);
+      if (total>0){
+        top1 = Number(largestVals[0]?.amount||0)/total*100;
+        top5 = largestVals.slice(0,5).reduce((s,v)=>s+Number(v.amount||0),0)/total*100;
+      }
+    }catch(e){/* ignore */}
+
+    // try: read on-chain metadata URI
+    const TOKEN_METADATA_PROGRAM_ID = new solanaWeb3.PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
+    const [pda] = await solanaWeb3.PublicKey.findProgramAddress([
+      new TextEncoder().encode('metadata'),
+      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+      mintPub.toBuffer()
+    ], TOKEN_METADATA_PROGRAM_ID);
+    const acc = await connection.getAccountInfo(pda);
+    let metadataUri = null; let metaJson = null;
+    if (acc && acc.data){
+      const text = new TextDecoder().decode(acc.data);
+      const m = text.match(/(https?:\/\/|ipfs:\/\/)[^"'\s]+/i);
+      if (m) metadataUri = m[0];
+    }
+
+    if (metadataUri){
+      // follow ipfs gateways
+      const resolved = metadataUri.startsWith('ipfs://') ? `https://cloudflare-ipfs.com/ipfs/${metadataUri.replace('ipfs://','')}` : metadataUri;
+      try{ const r = await fetch(resolved); if (r.ok) metaJson = await r.json(); }catch(e){ /* ignore */ }
+    }
+
+    // try to get parsed mint account for authorities
+    let mintInfo = null;
+    try{ mintInfo = await connection.getParsedAccountInfo(mintPub); }catch(e){}
+
+    const name = metaJson?.name || (metaJson?.symbol? metaJson.symbol:'Unknown');
+    const symbol = metaJson?.symbol || '—';
+    const logo = metaJson?.image || metaJson?.logo || '';
+    const website = metaJson?.external_url || metaJson?.properties?.website || (metaJson?.extensions?.website||'N/A');
+    const twitter = metaJson?.properties?.twitter || metaJson?.extensions?.twitter || 'N/A';
+    const discord = metaJson?.properties?.discord || metaJson?.extensions?.discord || 'N/A';
+
+    // critério booleanos para tabela e scoring
+    const criteria = [];
+    criteria.push({key:'metadata',label:'Metadados on-chain (URI)',ok:!!metadataUri,weight:12});
+    criteria.push({key:'logo',label:'Logo/Imagem disponível',ok:!!logo,weight:10});
+    criteria.push({key:'website',label:'Website válido no metadata',ok:!!website && website!=='N/A',weight:8});
+    criteria.push({key:'socials',label:'Twitter/Discord nos metadados',ok:(twitter!=='N/A' || discord!=='N/A'),weight:6});
+    criteria.push({key:'supply',label:'Supply válido (não zero)',ok: Number(supply.value.amount||0)>0,weight:10});
+    criteria.push({key:'holders',label:'Número de holders (maior que 100)',ok: largestVals.length>100,weight:8});
+    criteria.push({key:'concentration',label:'Maior holder < 50%',ok: top1>0 ? top1<50 : false,weight:12});
+    criteria.push({key:'top5',label:'Top5 < 80%',ok: top5>0 ? top5<80 : false,weight:8});
+    criteria.push({key:'mintAuthority',label:'Mint authority revogada (null)',ok: (mintInfo?.value?.data?.parsed?.info?.mintAuthority===null),weight:10});
+
+    // calc score
+    let maxScore = 0, score = 0;
+    for(const c of criteria){ maxScore += c.weight; if (c.ok) score += c.weight; }
+    const pct = Math.round((score/maxScore)*100);
+
+    // verdict
+    let verdict='Risco médio';
+    if (pct>=75) verdict='Confiável';
+    else if (pct<40) verdict='Provável SCAM';
+
+    // pick random meme
+    const meme = MEMES[Math.floor(Math.random()*MEMES.length)];
+
+    // montar tabela de critérios
+    const rows = criteria.map(c=>`<tr><td>${c.label}</td><td class="${c.ok? 'pass':'fail'}">${c.ok? 'OK':'—'}</td><td class="small">peso ${c.weight}</td></tr>`).join('');
+
+    // top holders list
+    const topHtml = (largestVals.slice(0,8).map((v,i)=>`<div class="small">#${i+1} ${short(v.pubkey)} — ${v.amount}</div>`)).join('');
+
+    // render
+    reportEl.innerHTML = `
+      <div class="row">
+        <div>
+          <h2>${name||'Unknown'} <span class="small">(${symbol})</span></h2>
+          <div class="kv"><div class="small">Mint</div><div>${short(mint)}</div></div>
+          <div class="kv"><div class="small">Supply / Decimals</div><div>${supplyStr} / ${decimals}</div></div>
+          <div class="kv"><div class="small">Holders (top seen)</div><div>${largestVals.length}</div></div>
+          <div class="kv"><div class="small">Score</div><div class="score">${pct}% — ${verdict}</div></div>
+
+          <div class="small" style="margin-top:8px">Raio-X dos requisitos</div>
+          <table><thead><tr><th>Requisito</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+
+          <div style="margin-top:8px"><b>Top holders (amostra):</b>${topHtml}</div>
+
+          <div class="actions">
+            <button onclick="downloadPDF('${encodeURIComponent(mint)}')">📄 Gerar PDF</button>
+            <button onclick="shareX()">🐦 Compartilhar no X</button>
+            <button onclick="shareTelegram()">📢 Compartilhar no Telegram</button>
+            <button onclick="window.open(document.getElementById('linkOrca').href,'_blank')">🐬 Comprar Turbo Tuga (Orca)</button>
+            <button onclick="window.open(document.getElementById('linkJup').href,'_blank')">🚀 Comprar Turbo Tuga (Jupiter)</button>
+          </div>
+        </div>
+        <div style="text-align:center">
+          ${logo? `<img src="${logo}" class="logo-img" alt="logo"/>` : `<div style="width:120px;height:120px;display:flex;align-items:center;justify-content:center;background:var(--glass);border-radius:12px">No logo</div>`}
+          <img src="${meme}" class="meme" alt="meme"/>
+          <div class="small" style="margin-top:6px">Meta URI: ${metadataUri? short(metadataUri): 'N/A'}</div>
+        </div>
+      </div>
+    `;
+
+    // store last report for PDF generation
+    window.__lastReport = {name,symbol,mint,supplyStr,decimals,largestVals,criteria,score:pct,verdict,logo,meme,website,twitter,discord,metadataUri};
+
+  }catch(err){
+    console.error(err);
+    document.getElementById('report').innerHTML = `<div class="small">❌ Erro: ${String(err)}</div>`;
+  }
+}
+
+document.getElementById('go').addEventListener('click',()=>{analyze()});
+
+// share to X (Twitter)
+function shareX(){
+  const r = window.__lastReport;
+  if(!r){ alert('Gere um relatório primeiro!'); return; }
+  const text = `${r.name} (${r.symbol}) — Score ${r.score}% — ${r.verdict}. Veja mais e compre em: ${document.getElementById('linkOrca').href}`;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,'_blank');
+}
+
+function shareTelegram(){
+  const r = window.__lastReport;
+  if(!r){ alert('Gere um relatório primeiro!'); return; }
+  const text = `Turbo Tuga Analyzer\n${r.name} (${r.symbol}) — ${r.score}% — ${r.verdict}\nCompras: ${document.getElementById('linkOrca').href}`;
+  window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(text)}`,'_blank');
+}
+
+// PDF generation (text + meme image if possible)
+async function downloadPDF(mintEnc){
+  const r = window.__lastReport;
+  if(!r){ alert('Gere um relatório primeiro!'); return; }
+  // load jsPDF dynamically
+  if(!window.jspdf){
+    try{ await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'); }catch(e){ console.error(e); alert('Falha ao carregar jsPDF'); return; }
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt',format:'a4'});
+  const margin = 40; let y=40;
+  doc.setFontSize(18); doc.text('Turbo Tuga — Token Report', margin, y); y+=24;
+  doc.setFontSize(12); doc.text(`Name: ${r.name} (${r.symbol})`, margin, y); y+=18;
+  doc.text(`Mint: ${r.mint}`, margin, y); y+=16;
+  doc.text(`Score: ${r.score}% — ${r.verdict}`, margin, y); y+=18;
+  doc.text(`Supply: ${r.supplyStr} — Decimals: ${r.decimals}`, margin, y); y+=18;
+  doc.text('Requisitos:', margin, y); y+=14;
+  for(const c of r.criteria){ doc.text(`- ${c.label}: ${c.ok? 'OK':'NO'}`, margin+8, y); y+=12; if(y>720){ doc.addPage(); y=40; } }
+  y+=8;
+  // try add meme image
+  try{
+    if(r.meme){
+      const imgData = await fetchAsDataURL(r.meme);
+      if(imgData){ doc.addImage(imgData,'JPEG', margin, y, 180, 120); }
+    }
+  }catch(e){ console.warn('img pdf',e); }
+  doc.save(`turbo_tuga_report_${short(r.mint)}.pdf`);
+}
+
+async function fetchAsDataURL(url){
+  try{
+    const res = await fetch(url); const blob = await res.blob();
+    return await new Promise((res2)=>{ const fr=new FileReader(); fr.onload=()=>res2(fr.result); fr.readAsDataURL(blob); });
+  }catch(e){return null}
+}
+
+</script>
 </body>
 </html>
