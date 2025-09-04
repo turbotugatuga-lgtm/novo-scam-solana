@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <title>Turbo Tuga Token Analyzer</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/@solana/web3.js@1.87.6/lib/index.iife.js"></script>
 </head>
 <body>
-  <!-- Barra fixa com links -->
+  <!-- Barra fixa -->
   <header class="topbar">
     <a href="https://app.orca.so" target="_blank">🐬 Comprar na Orca</a>
     <a href="https://jup.ag" target="_blank">🚀 Comprar na Jupiter</a>
@@ -20,7 +21,127 @@
     <div id="report"></div>
   </main>
 
-  <script src="config.js"></script>
-  <script src="script.js"></script>
+  <script>
+    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"));
+
+    const TOKEN_METADATA_PROGRAM_ID = new solanaWeb3.PublicKey(
+      "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+    );
+
+    const memes = [
+      "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
+      "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+      "https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif",
+      "https://media.giphy.com/media/3o7abldj0b3rxrZUxW/giphy.gif",
+      "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+      "https://media.giphy.com/media/l0MYC0LajbaPoEADu/giphy.gif"
+    ];
+
+    async function fetchMetadataUri(mintPub) {
+      const [metadataPDA] = await solanaWeb3.PublicKey.findProgramAddress(
+        [
+          Buffer.from("metadata"),
+          TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+          mintPub.toBuffer(),
+        ],
+        TOKEN_METADATA_PROGRAM_ID
+      );
+      const accountInfo = await connection.getAccountInfo(metadataPDA);
+      if (!accountInfo) return null;
+
+      // Decodificar Metaplex Metadata (URI começa depois de alguns bytes fixos)
+      const data = accountInfo.data;
+      const str = new TextDecoder("utf-8").decode(data);
+      const urlMatch = str.match(/https:\/\/[^\s"]+/);
+      return urlMatch ? urlMatch[0] : null;
+    }
+
+    async function generateReport() {
+      const mintInput = document.getElementById("tokenInput").value.trim();
+      if (!mintInput) return alert("⚠️ Informe um token mint válido");
+
+      const mintPub = new solanaWeb3.PublicKey(mintInput);
+
+      let report = {
+        name: "Unknown",
+        symbol: "Unknown",
+        supply: "N/A",
+        decimals: "N/A",
+        holders: "N/A",
+        website: "N/A",
+        twitter: "N/A",
+        discord: "N/A",
+        logo: "",
+      };
+
+      try {
+        // Supply & Decimals
+        const supplyInfo = await connection.getTokenSupply(mintPub);
+        report.supply = supplyInfo.value.uiAmountString;
+        report.decimals = supplyInfo.value.decimals;
+
+        // Holders
+        const largestAccounts = await connection.getTokenLargestAccounts(mintPub);
+        report.holders = largestAccounts.value.length;
+
+        // Metadata URI
+        const metadataUri = await fetchMetadataUri(mintPub);
+        if (metadataUri) {
+          const metaResp = await fetch(metadataUri);
+          const json = await metaResp.json();
+          report.name = json.name || report.name;
+          report.symbol = json.symbol || report.symbol;
+          report.logo = json.image || "";
+          if (json.extensions) {
+            report.website = json.extensions.website || report.website;
+            report.twitter = json.extensions.twitter || report.twitter;
+            report.discord = json.extensions.discord || report.discord;
+          }
+        }
+
+        // Score básico
+        let score = 40;
+        if (report.holders > 1000) score += 20;
+        if (report.website !== "N/A") score += 15;
+        if (report.twitter !== "N/A") score += 15;
+
+        const meme = memes[Math.floor(Math.random() * memes.length)];
+
+        // Render
+        document.getElementById("report").innerHTML = `
+          <h2>📊 Token Report</h2>
+          ${report.logo ? `<img src="${report.logo}" alt="logo" style="max-width:100px;border-radius:8px;"/>` : ""}
+          <p><b>Name / Symbol:</b> ${report.name} (${report.symbol})</p>
+          <p><b>Mint:</b> ${mintInput}</p>
+          <p><b>Score:</b> ${score}/100</p>
+          <p><b>Supply / Decimals:</b> ${report.supply} / ${report.decimals}</p>
+          <p><b>Holders:</b> ${report.holders}</p>
+          <p><b>Website:</b> <a href="${report.website}" target="_blank">${report.website}</a></p>
+          <p><b>Twitter:</b> ${report.twitter}</p>
+          <p><b>Discord:</b> ${report.discord}</p>
+          <img src="${meme}" class="meme"/>
+          <div style="margin-top:20px;">
+            <button onclick="window.open('https://app.orca.so', '_blank')">🐬 Buy on Orca</button>
+            <button onclick="window.open('https://jup.ag', '_blank')">🚀 Buy on Jupiter</button>
+            <button onclick="window.open('https://solscan.io/account/2NERt9zLBG2tKbcPXwfBYsRrPhFMVAxpR6ajfeEWeJSB','_blank')">❤️ Donate</button>
+            <button onclick="shareTwitter()">🐦 Share Twitter</button>
+            <button onclick="shareTelegram()">📢 Share Telegram</button>
+          </div>
+        `;
+      } catch (err) {
+        console.error(err);
+        document.getElementById("report").innerHTML = `❌ Erro ao gerar relatório: ${err.message}`;
+      }
+    }
+
+    function shareTwitter() {
+      const text = document.getElementById("report").innerText;
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
+    }
+    function shareTelegram() {
+      const text = document.getElementById("report").innerText;
+      window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(text)}`, "_blank");
+    }
+  </script>
 </body>
 </html>
