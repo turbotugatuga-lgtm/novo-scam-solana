@@ -1,42 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>🐢 Turbo Tuga - Scam Detector</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>🐢 Turbo Tuga - Scam Detector</h1>
   <p>Enter the token mint address (SPL) below to generate a full risk analysis report.</p>
 
-  <input type="text" id="tokenInput" placeholder="Paste token mint address" size="60">
-  <br>
-  <button onclick="generateReport()">🔍 Generate Report</button>
+  <input type="text" id="tokenInput" placeholder="Paste token mint address (e.g. So111...)" />
+  <button id="btnGen" onclick="generateReport()">🔍 Generate Report</button>
 
-  <div id="report" class="report"></div>
-
-  <!-- Links fixos -->
+  <!-- Ações fixas -->
   <div class="links">
-    <a class="btn" href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">🛒 Buy Turbo Tuga on Orca</a>
-    <a class="btn" href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">🛒 Buy Turbo Tuga on Jupiter</a>
-    <a class="btn" href="https://explorer.solana.com/address/2NERt9zLBG2tKbcPXwfBYsRrPhFMVAxpR6ajfeEWeJSB" target="_blank">💝 Donate to Turbo Tuga</a>
+    <a class="btn" href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank" rel="noopener">🛒 Buy Turbo Tuga on Orca</a>
+    <a class="btn" href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank" rel="noopener">🛒 Buy Turbo Tuga on Jupiter</a>
+    <a class="btn" href="https://explorer.solana.com/address/2NERt9zLBG2tKbcPXwfBYsRrPhFMVAxpR6ajfeEWeJSB" target="_blank" rel="noopener">💝 Donate to Turbo Tuga</a>
+  </div>
+
+  <div id="report" class="report">
+    <!-- relatório renderiza aqui -->
   </div>
 
   <div class="footer">
-    ⚠️ This automated analysis is for educational purposes only.<br>
-    It is not financial advice. Always DYOR.<br>
-    © Turbo Tuga Detector — Powered by Shyft + Jupiter
+    ⚠️ This automated analysis is for educational purposes only. It is not financial advice. Always DYOR.<br>
+    © Turbo Tuga Detector — Powered by Shyft + Solscan + Birdeye + Jupiter
   </div>
 
   <script>
-    // 🔑 API keys configuration
+    // 🔑 API keys configuration (use as config central)
     window.CONFIG = {
-      SHYFT_API_KEY: "VzPp9y_hw4dFfmfF",   // Shyft API key
-      BIRDEYE_API_KEY: ""                  // optional
+      SHYFT_API_KEY: "VzPp9y_hw4dFfmfF",
+      BIRDEYE_API_KEY: "22febf5b37e34452af2cc632dff69b88"
     };
   </script>
-  <!-- Lib para gerar PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Lib PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-YcsIPfQY6z9b9s1Y9lqgN9tNq3zNqT2fD8uKjH0iY0m2tJxwNnG0+5dEoT8v6v8uV2X9Y6AqPj7x2P5hVQjD5A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="script.js"></script>
 </body>
 </html>
