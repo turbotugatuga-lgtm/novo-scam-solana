@@ -1,3 +1,53 @@
+async function safeFetchJson(url, options = {}) {
+  try {
+    const res = await fetch(url, options);
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      console.warn("⚠️ Resposta não-JSON de:", url, text.slice(0,100));
+      return null;
+    }
+  } catch (err) {
+    console.error("❌ Erro de rede:", err);
+    return null;
+  }
+}
+
+// 30 GIFs/memes
+const memes = [
+  "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
+  "https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif",
+  "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+  "https://media.giphy.com/media/l2JHRhAtnJSDNJ2py/giphy.gif",
+  "https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif",
+  "https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif",
+  "https://media.giphy.com/media/26gsspf0C0j7M2z20/giphy.gif",
+  "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif",
+  "https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif",
+  "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif",
+  "https://media.giphy.com/media/13CoXDiaCcCoyk/giphy.gif",
+  "https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif",
+  "https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif",
+  "https://media.giphy.com/media/3o6fJ1BM7r60LymVji/giphy.gif",
+  "https://media.giphy.com/media/UqZ9m6R7gqC8w/giphy.gif",
+  "https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif",
+  "https://media.giphy.com/media/3oz8xIsloV7zOmt81G/giphy.gif",
+  "https://media.giphy.com/media/3oKIPCSX4UHmuS41TG/giphy.gif",
+  "https://media.giphy.com/media/xT1Ra4uO6t8U6uR8Le/giphy.gif",
+  "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
+  "https://media.giphy.com/media/3ohs7JG0tTQVLfKJEA/giphy.gif",
+  "https://media.giphy.com/media/l1J3preURPiwjRPvG/giphy.gif",
+  "https://media.giphy.com/media/3o7abldj0b3rxrZUxW/giphy.gif",
+  "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+  "https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif",
+  "https://media.giphy.com/media/xT0GqeSlGSRQutnWHe/giphy.gif",
+  "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+  "https://media.giphy.com/media/3ohhwJ7h5wcC2D5nna/giphy.gif",
+  "https://media.giphy.com/media/l0MYC0LajbaPoEADu/giphy.gif",
+  "https://media.giphy.com/media/xT9IgIc0lryrxvqVGM/giphy.gif"
+];
+
 async function generateReport() {
   const mint = document.getElementById("tokenInput").value.trim();
   if (!mint) {
@@ -25,12 +75,11 @@ async function generateReport() {
 
   try {
     // --- Shyft ---
-    const shyftRes = await fetch(
+    const shyftData = await safeFetchJson(
       `https://api.shyft.to/sol/v1/token/get_info?network=mainnet-beta&token_address=${mint}`,
       { headers: { "x-api-key": shyftKey } }
     );
-    const shyftData = await shyftRes.json();
-    if (shyftData.success) {
+    if (shyftData && shyftData.success) {
       const d = shyftData.result;
       report.name = d.name || report.name;
       report.symbol = d.symbol || report.symbol;
@@ -42,12 +91,11 @@ async function generateReport() {
 
     // --- Birdeye ---
     if (birdeyeKey) {
-      const beRes = await fetch(
+      const beData = await safeFetchJson(
         `https://public-api.birdeye.so/defi/token_overview?address=${mint}`,
         { headers: { "X-API-KEY": birdeyeKey } }
       );
-      const beData = await beRes.json();
-      if (beData.success && beData.data) {
+      if (beData && beData.success && beData.data) {
         report.price = beData.data.price || report.price;
         report.volume24h = beData.data.volume24h || report.volume24h;
         report.liquidity = beData.data.liquidity || report.liquidity;
@@ -56,62 +104,28 @@ async function generateReport() {
       }
     }
 
-    // --- Solscan (holders) ---
-    const solscanRes = await fetch(`https://public-api.solscan.io/token/holders?tokenAddress=${mint}&limit=1`);
-    const solscanData = await solscanRes.json();
+    // --- Solscan ---
+    const solscanData = await safeFetchJson(
+      `https://public-api.solscan.io/token/holders?tokenAddress=${mint}&limit=1`
+    );
     if (solscanData && solscanData.data) {
       report.holders = solscanData.total || report.holders;
     }
 
-    // --- Jupiter (preço fallback) ---
-    const jupRes = await fetch(`https://price.jup.ag/v6/price?ids=${mint}`);
-    const jupData = await jupRes.json();
-    if (jupData.data && jupData.data[mint]) {
+    // --- Jupiter ---
+    const jupData = await safeFetchJson(`https://price.jup.ag/v6/price?ids=${mint}`);
+    if (jupData && jupData.data && jupData.data[mint]) {
       report.price = jupData.data[mint].price || report.price;
     }
 
-    // --- Score simples ---
+    // Score (simplificado)
     let score = 50;
-    if (report.holders !== "N/A" && report.holders > 1000) score += 10;
-    if (report.liquidity !== "N/A" && report.liquidity > 10000) score += 10;
-    if (report.mintAuthority === "Revoked") score += 5;
+    if (report.mintAuthority === "Revoked") score += 10;
+    if (report.freezeAuthority === "None") score += 10;
+    if (report.holders !== "N/A" && report.holders > 1000) score += 20;
 
-    // --- Lista de 30 GIFs engraçados ---
-    const gifs = [
-      "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
-      "https://media.giphy.com/media/l3vR85PnGsBwu1PFK/giphy.gif",
-      "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
-      "https://media.giphy.com/media/xT5LMzIK1AdZJ2y2dC/giphy.gif",
-      "https://media.giphy.com/media/jUwpNzg9IcyrK/giphy.gif",
-      "https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif",
-      "https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif",
-      "https://media.giphy.com/media/13CoXDiaCcCoyk/giphy.gif",
-      "https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif",
-      "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
-      "https://media.giphy.com/media/l4KibWpBGWchSqCRy/giphy.gif",
-      "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
-      "https://media.giphy.com/media/26u4hLq6uB6D4jUuk/giphy.gif",
-      "https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif",
-      "https://media.giphy.com/media/26n6xBpxNXExDfuKk/giphy.gif",
-      "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
-      "https://media.giphy.com/media/3o7aD4K2kpkj8cYFLO/giphy.gif",
-      "https://media.giphy.com/media/3o6Zt8MgUuvSbkZYWc/giphy.gif",
-      "https://media.giphy.com/media/xUPGcguWZHRC2HyBRS/giphy.gif",
-      "https://media.giphy.com/media/3o7aCTfyhYawdOXcFW/giphy.gif",
-      "https://media.giphy.com/media/xT9IgIc0lryrxvqVGM/giphy.gif",
-      "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif",
-      "https://media.giphy.com/media/xT9IgIc0lryrxvqVGM/giphy.gif",
-      "https://media.giphy.com/media/3o7TKQb2g2y5PNeHFS/giphy.gif",
-      "https://media.giphy.com/media/xT9IgGKHj7KnwS0wA0/giphy.gif",
-      "https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif",
-      "https://media.giphy.com/media/3o7TKtnuHOHHUjR38Y/giphy.gif",
-      "https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif",
-      "https://media.giphy.com/media/26gR1K3H4wbG5P2Zy/giphy.gif",
-      "https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif"
-    ];
-    const randomGif = gifs[Math.floor(Math.random() * gifs.length)];
+    const meme = memes[Math.floor(Math.random() * memes.length)];
 
-    // --- Render ---
     document.getElementById("report").innerHTML = `
       <h2>📊 Token Report</h2>
       <p><b>Name / Symbol:</b> ${report.name} (${report.symbol})</p>
@@ -123,30 +137,34 @@ async function generateReport() {
       <p><b>Market Cap:</b> ${report.marketCap}</p>
       <p><b>Supply / Decimals:</b> ${report.supply} / ${report.decimals}</p>
       <p><b>Holders:</b> ${report.holders}</p>
-      <p><b>Mint authority:</b> ${report.mintAuthority}</p>
-      <p><b>Freeze authority:</b> ${report.freezeAuthority}</p>
-      <p><b>Website:</b> ${report.website}</p>
-      <div class="gif-box"><img src="${randomGif}" width="300"></div>
-      <hr>
-      <button onclick="exportPDF()">📄 Exportar PDF</button>
-      <button onclick="shareReport()">📢 Compartilhar</button>
+      <p><b>Mint Authority:</b> ${report.mintAuthority}</p>
+      <p><b>Freeze Authority:</b> ${report.freezeAuthority}</p>
+      <p><b>Website:</b> <a href="${report.website}" target="_blank">${report.website}</a></p>
+      <p><b>Risk:</b> ⚠️ Medium risk — caution advised</p>
+      <img src="${meme}" class="meme" />
+      <div style="margin-top:20px;">
+        <button onclick="window.open('https://app.orca.so', '_blank')">🐬 Buy on Orca</button>
+        <button onclick="window.open('https://jup.ag', '_blank')">🚀 Buy on Jupiter</button>
+        <button onclick="window.open('https://solscan.io/account/2NERt9zLBG2tKbcPXwfBYsRrPhFMVAxpR6ajfeEWeJSB','_blank')">❤️ Donate</button>
+        <button onclick="exportPDF()">📄 PDF</button>
+        <button onclick="shareTwitter()">🐦 Share Twitter</button>
+        <button onclick="shareTelegram()">📢 Share Telegram</button>
+      </div>
     `;
   } catch (err) {
-    console.error("Erro detalhado:", err);
-    document.getElementById("report").innerHTML = `❌ Erro: ${err.message}`;
+    console.error("❌ Erro final:", err);
+    document.getElementById("report").innerHTML = `❌ Erro ao gerar relatório: ${err.message}`;
   }
 }
 
-// --- Export PDF (placeholder) ---
 function exportPDF() {
-  alert("📄 Export PDF será implementado futuramente.");
+  alert("📄 Função PDF ainda em desenvolvimento!");
 }
-
-// --- Share (Twitter + Telegram) ---
-function shareReport() {
+function shareTwitter() {
   const text = document.getElementById("report").innerText;
-  const twitter = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-  const telegram = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`;
-  window.open(twitter, "_blank");
-  window.open(telegram, "_blank");
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
+}
+function shareTelegram() {
+  const text = document.getElementById("report").innerText;
+  window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(text)}`, "_blank");
 }
