@@ -1,4 +1,4 @@
-// 🔑 RPC configurado com sua chave da Helius
+// 🔑 RPC configurado com Helius
 const RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=66d627c2-34b8-4c3e-9123-14f16e196ab8";
 const connection = new solanaWeb3.Connection(RPC_ENDPOINT);
 
@@ -9,6 +9,11 @@ const memes = [
   "https://media.giphy.com/media/l2JHRhAtnJSDNJ2py/giphy.gif",
   "https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif"
 ];
+
+// --- Buffer compatível com browser ---
+function bufferFromBytes(bytes){
+  return Uint8Array.from(bytes);
+}
 
 async function generateReport(){
   const mintInput = document.getElementById("tokenInput").value.trim();
@@ -36,9 +41,9 @@ async function generateReport(){
 
     const [metadataPDA] = await solanaWeb3.PublicKey.findProgramAddress(
       [
-        Buffer.from("metadata"),
-        TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-        mintPub.toBuffer()
+        new TextEncoder().encode("metadata"),
+        TOKEN_METADATA_PROGRAM_ID.toBytes(),
+        mintPub.toBytes()
       ],
       TOKEN_METADATA_PROGRAM_ID
     );
@@ -90,8 +95,8 @@ async function generateReport(){
         <img src="${meme}" class="meme"/>
       </div>
       <div style="margin-top:20px;">
-        <button onclick="window.open('https://app.orca.so', '_blank')">🐬 Buy on Orca</button>
-        <button onclick="window.open('https://jup.ag', '_blank')">🚀 Buy on Jupiter</button>
+        <button onclick="window.open('https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112', '_blank')">Comprar Turbo Tuga em DEX Orca</button>
+        <button onclick="window.open('https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112', '_blank')">Comprar Token Turbo Tuga dex Jupiter</button>
         <button onclick="exportPDF()">📄 PDF</button>
         <button onclick="shareTwitter()">🐦 Share Twitter</button>
         <button onclick="shareTelegram()">📢 Share Telegram</button>
