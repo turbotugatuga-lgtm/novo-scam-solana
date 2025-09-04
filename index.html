@@ -1,115 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>🐢 Turbo Tuga - Scam Detector</title>
-<style>
-body {
-  font-family: Arial, sans-serif;
-  max-width: 900px;
-  margin: 80px auto 20px auto;
-  padding: 20px;
-  background: #f9fafb;
-  color: #333;
-}
-h1 {
-  text-align: center;
-  color: #0f766e;
-  margin-bottom: 20px;
-}
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  font-size: 16px;
-}
-button, .btn {
-  padding: 10px 15px;
-  margin: 5px;
-  background: #0f766e;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-button:hover, .btn:hover { background: #115e59; }
-#report {
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  margin-top: 20px;
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.6s ease;
-}
-#report.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-.kv { display:flex; justify-content: space-between; margin:5px 0; }
-.key { font-weight: bold; color: #0f766e; }
-.val { text-align: right; }
-.gif-animated {
-  animation: jump 1s ease-in-out infinite;
-  display:block;
-  margin: 10px auto;
-  max-width: 300px;
-}
-@keyframes jump {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
-}
-#topLinks {
-  position: fixed;
-  top:0; left:0; right:0;
-  background:#0f766e; padding:10px;
-  text-align:center; z-index:999;
-}
-#topLinks a {
-  color:white; margin:0 10px;
-  text-decoration:none; font-weight:bold;
-}
-#topLinks a:hover { text-decoration: underline; }
-.footer {
-  margin-top: 30px;
-  font-size: 0.8em;
-  text-align: center;
-  color: #555;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Turbo Tuga Token Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      background: #f8f9fa;
+    }
+    header {
+      background: #222;
+      color: #fff;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      z-index: 1000;
+    }
+    header a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: #444;
+    }
+    main {
+      margin-top: 70px;
+      padding: 20px;
+    }
+    input {
+      padding: 8px;
+      width: 400px;
+      max-width: 90%;
+    }
+    button {
+      padding: 8px 14px;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+    .kv {
+      display: flex;
+      justify-content: space-between;
+      margin: 4px 0;
+      padding: 4px 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    .kv .key { font-weight: bold; }
+    .gif-animated { margin-top: 15px; }
+    @keyframes jump {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-15px); }
+    }
+  </style>
 </head>
 <body>
 
-<div id="topLinks">
-  <a id="btnOrca" href="#" target="_blank">🛒 Buy on Orca</a>
-  <a id="btnJupiter" href="#" target="_blank">🛒 Buy on Jupiter</a>
-  <a id="btnDonate" href="#" target="_blank">💝 Donate</a>
-</div>
+  <!-- Barra fixa de links -->
+  <header>
+    <a id="btnOrca" href="#" target="_blank">🐋 Buy on Orca</a>
+    <a id="btnJupiter" href="#" target="_blank">🪐 Buy on Jupiter</a>
+    <a id="btnDonate" href="#" target="_blank">💜 Donate</a>
+  </header>
 
-<h1>🐢 Turbo Tuga - Scam Detector</h1>
+  <main>
+    <h1>Turbo Tuga Scam Detector</h1>
+    <p>Enter a token mint address below to analyze:</p>
+    <input type="text" id="tokenInput" placeholder="Paste token mint address here">
+    <button onclick="generateReport()">Generate Report</button>
 
-<p>Enter the token mint address (SPL) below to generate a full risk analysis report.</p>
+    <div id="report" style="margin-top:20px; text-align:left; max-width:600px; margin-left:auto; margin-right:auto; background:white; padding:15px; border-radius:8px; box-shadow:0 0 8px rgba(0,0,0,0.1);"></div>
+  </main>
 
-<input type="text" id="tokenInput" placeholder="Paste token mint address" size="60">
-<br>
-<button onclick="generateReport()">🔍 Generate Report</button>
-
-<div id="report"></div>
-
-<div class="footer">
-⚠️ This automated analysis is for educational purposes only.<br>
-It is not financial advice. Always DYOR.<br>
-© Turbo Tuga Detector — Powered by Shyft + Birdeye + Jupiter
-</div>
-
-<script src="config.js"></script>
-<script src="script.js"></script>
-<script>
-  const reportDiv = document.getElementById("report");
-  const observer = new MutationObserver(() => reportDiv.classList.add("show"));
-  observer.observe(reportDiv, { childList: true, subtree: true });
-</script>
+  <!-- Config & Script -->
+  <script src="config.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
