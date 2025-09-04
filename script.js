@@ -1,4 +1,6 @@
-// ---- GIFs por nível de risco -----------------------------------------------
+// ==========================
+// GIFs de risco (30 aleatórios)
+// ==========================
 const gifsHigh = [
   "https://media.giphy.com/media/ROF8OQvDmxytW/giphy.gif",
   "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
@@ -7,11 +9,10 @@ const gifsHigh = [
   "https://media.giphy.com/media/26BRuo6sLetdllPAQ/giphy.gif",
   "https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif",
   "https://media.giphy.com/media/l4KibK3JwaVo0CjDO/giphy.gif",
-  "https://media.giphy.com/media/26BkNrGhy4DKnbD9u/giphy.gif",
+  "https://media.giphy.com/media/26gsjCZpPolPr3sBy/giphy.gif",
   "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
   "https://media.giphy.com/media/26AOsbfXkUZx4/giphy.gif"
 ];
-
 const gifsMedium = [
   "https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif",
   "https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif",
@@ -24,13 +25,11 @@ const gifsMedium = [
   "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif",
   "https://media.giphy.com/media/3o6ZtaO9BZHcOjmErm/giphy.gif"
 ];
-
 const gifsLow = [
   "https://media.giphy.com/media/3orieYxFwPfaW5n4Ck/giphy.gif",
   "https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif",
   "https://media.giphy.com/media/26xBwdIuRJiAIqHwA/giphy.gif",
   "https://media.giphy.com/media/l4Hnq5CcYJ1b6B8Pu/giphy.gif",
-  "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
   "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif",
   "https://media.giphy.com/media/l0Exk8EUzSLsrErEQ/giphy.gif",
   "https://media.giphy.com/media/l4pTdcif6uY3iI3kE/giphy.gif",
@@ -38,69 +37,18 @@ const gifsLow = [
   "https://media.giphy.com/media/xT0GqssRweIhlz209i/giphy.gif"
 ];
 
-// ---- Helpers ---------------------------------------------------------------
-function fmt(v) {
-  if (v === null || v === undefined || v === "N/A") return "N/A";
-  if (typeof v === "number") {
-    if (v >= 1e12) return (v/1e12).toFixed(2) + " T";
-    if (v >= 1e9)  return (v/1e9).toFixed(2) + " B";
-    if (v >= 1e6)  return (v/1e6).toFixed(2) + " M";
-    if (v >= 1e3)  return (v/1e3).toFixed(2) + " K";
-    return v.toString();
-  }
-  return v;
-}
-
-function sanitizeUrl(u) {
-  if (!u) return "N/A";
-  if (typeof u !== "string") return "N/A";
-  if (!/^https?:\/\//i.test(u)) return u;
-  return u;
-}
-
 function pickRandomGif(score) {
   let arr = gifsMedium;
-  if(score < 40) arr = gifsHigh;
-  if(score > 80) arr = gifsLow;
+  if (score < 40) arr = gifsHigh;
+  if (score > 80) arr = gifsLow;
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function pickScoreColor(score) {
-  if(score < 40) return "red";
-  if(score > 80) return "green";
-  return "orange";
-}
-
-function buildShareText({report, mint, score, riskMsg, riskGif}) {
-  const lines = [
-    "🚨 Turbo Tuga Token Report",
-    `Name: ${report.name} (${report.symbol})`,
-    `Mint: ${mint}`,
-    `Score: ${score}/100`,
-    `Price: ${fmt(report.price)}${report.price!== "N/A" ? " USD" : ""}`,
-    `24h Volume: ${fmt(report.volume24h)}`,
-    `Liquidity: ${fmt(report.liquidity)}`,
-    `Market Cap: ${fmt(report.marketCap)}`,
-    `Supply / Decimals: ${fmt(report.supply)} / ${fmt(report.decimals)}`,
-    `Holders: ${fmt(report.holders)}`,
-    `Mint authority: ${report.mintAuthority}`,
-    `Freeze authority: ${report.freezeAuthority}`,
-    `Website: ${report.website}`,
-    report.socials && report.socials.length ? `Socials: ${report.socials.join(", ")}` : "",
-    riskMsg,
-    `Meme: ${riskGif}`,
-    `Check on Turbo Tuga Scam Detector: ${location.href}`
-  ].filter(Boolean);
-  return lines.join("\n");
-}
-
-// ---- Main ------------------------------------------------------------------
+// ==========================
+// Função principal
+// ==========================
 async function generateReport() {
-  let mintRaw = document.getElementById("tokenInput").value.trim();
-  if (mintRaw.includes("?")) mintRaw = mintRaw.split("?")[0];
-  if (mintRaw.includes("&")) mintRaw = mintRaw.split("&")[0];
-  const mint = mintRaw;
-
+  const mint = document.getElementById("tokenInput").value.trim();
   if (!mint) {
     alert("Please enter a token mint address.");
     return;
@@ -109,7 +57,7 @@ async function generateReport() {
   const shyftKey = window.CONFIG.SHYFT_API_KEY;
   const birdeyeKey = window.CONFIG.BIRDEYE_API_KEY;
 
-  const report = {
+  let report = {
     name: "Unknown",
     symbol: "Unknown",
     supply: "N/A",
@@ -121,15 +69,17 @@ async function generateReport() {
     volume24h: "N/A",
     liquidity: "N/A",
     marketCap: "N/A",
-    website: "N/A",
-    socials: []
+    website: "N/A"
   };
 
   try {
-    // ---- 1) Shyft / RPC ----
-    const shyftRes = await fetch(`https://api.shyft.to/sol/v1/token/get_info?network=mainnet-beta&token_address=${mint}`, { headers: { "x-api-key": shyftKey } });
+    // ---- Shyft: dados on-chain ----
+    const shyftRes = await fetch(
+      `https://api.shyft.to/sol/v1/token/get_info?network=mainnet-beta&token_address=${mint}`,
+      { headers: { "x-api-key": shyftKey } }
+    );
     const shyftData = await shyftRes.json();
-    if (shyftData.success && shyftData.result) {
+    if (shyftData.success) {
       const d = shyftData.result;
       report.name = d.name || report.name;
       report.symbol = d.symbol || report.symbol;
@@ -139,101 +89,116 @@ async function generateReport() {
       report.freezeAuthority = d.freeze_authority || "None";
     }
 
-    // ---- 2) Birdeye ----
+    // ---- Birdeye: preço, volume, liquidez, market cap, website ----
     if (birdeyeKey) {
-      const beRes = await fetch(`https://public-api.birdeye.so/defi/token_overview?address=${mint}`, { headers: { "X-API-KEY": birdeyeKey } });
+      const beRes = await fetch(
+        `https://public-api.birdeye.so/defi/token_overview?address=${mint}`,
+        { headers: { "X-API-KEY": birdeyeKey } }
+      );
       const beData = await beRes.json();
       if (beData.success && beData.data) {
-        report.price = beData.data.price || report.price;
-        report.volume24h = beData.data.volume24h || report.volume24h;
-        report.liquidity = beData.data.liquidity || report.liquidity;
-        report.marketCap = beData.data.mc || report.marketCap;
+        const d = beData.data;
+        report.price = d.price || report.price;
+        report.volume24h = d.v24hUsd || report.volume24h;
+        report.liquidity = d.liquidity || report.liquidity;
+        report.marketCap = d.mc || report.marketCap;
+        if (d.extensions && d.extensions.website) {
+          report.website = d.extensions.website;
+        }
       }
     }
 
-    // ---- 3) Jupiter fallback ----
-    try {
-      const jupRes = await fetch(`https://price.jup.ag/v4/price?ids=${mint}`);
-      const jupData = await jupRes.json();
-      if (jupData.data && jupData.data[mint]) report.price = jupData.data[mint].price || report.price;
-    } catch(e){}
-
-    // ---- 4) Score ----
-    let score = 65;
-    if (report.mintAuthority !== "Revoked") score -= 20;
-    if (report.freezeAuthority !== "None") score -= 10;
-
-    const holdersNum = Number(report.holders);
-    if (!isNaN(holdersNum)) {
-      if (holdersNum < 50) score -= 20;
-      if (holdersNum > 500) score += 10;
+    // ---- Solscan: holders ----
+    const ssRes = await fetch(
+      `https://public-api.solscan.io/token/holders?tokenAddress=${mint}&limit=1`
+    );
+    const ssData = await ssRes.json();
+    if (ssData.data) {
+      report.holders = ssData.total || report.holders;
     }
 
-    const liqNum = Number(report.liquidity);
-    if (!isNaN(liqNum)) {
-      if (liqNum < 1000) score -= 15;
-      if (liqNum > 100000) score += 10;
-    } else score -= 10;
+    // ---- Jupiter: preço fallback ----
+    const jupRes = await fetch(`https://price.jup.ag/v6/price?ids=${mint}`);
+    const jupData = await jupRes.json();
+    if (jupData.data && jupData.data[mint]) {
+      report.price = jupData.data[mint].price || report.price;
+    }
 
-    if (report.supply !== "N/A" && report.decimals !== "N/A") score += 5;
-    if (score < 0) score = 0;
-    if (score > 100) score = 100;
+    // ---- Calcular Score ----
+    let score = 50;
+    if (report.price !== "N/A") score += 10;
+    if (report.liquidity !== "N/A" && report.liquidity > 10000) score += 10;
+    if (report.holders !== "N/A" && report.holders > 200) score += 10;
+    if (report.mintAuthority === "Revoked") score += 10;
 
     let riskMsg = "⚠️ Medium risk — caution advised";
-    if (score < 40) riskMsg = "❌ High risk — possible scam!";
-    if (score > 80) riskMsg = "✅ Low risk — safer token";
+    if (score < 40) riskMsg = "🚨 High risk! Likely scam";
+    if (score > 80) riskMsg = "✅ Low risk — looks safer";
 
     const riskGif = pickRandomGif(score);
 
-    // ---- Render ----
-    const html = `
-      <div id="reportContent">
-        <h2>Token Report</h2>
-        <div class="kv"><div class="key">Name / Symbol</div><div class="val"><b>${report.name}</b> (${report.symbol})</div></div>
-        <div class="kv"><div class="key">Mint</div><div class="val">${mint}</div></div>
-        <div class="kv"><div class="key">Score</div><div class="val" style="color:${pickScoreColor(score)};"><b>${score}/100</b></div></div>
-        <div class="kv"><div class="key">Price</div><div class="val">${fmt(report.price)}</div></div>
-        <div class="kv"><div class="key">24h Volume</div><div class="val">${fmt(report.volume24h)}</div></div>
-        <div class="kv"><div class="key">Liquidity</div><div class="val">${fmt(report.liquidity)}</div></div>
-        <div class="kv"><div class="key">Market Cap</div><div class="val">${fmt(report.marketCap)}</div></div>
-        <div class="kv"><div class="key">Supply / Decimals</div><div class="val">${fmt(report.supply)} / ${fmt(report.decimals)}</div></div>
-        <div class="kv"><div class="key">Holders</div><div class="val">${fmt(report.holders)}</div></div>
-        <div class="kv"><div class="key">Mint Authority</div><div class="val">${report.mintAuthority}</div></div>
-        <div class="kv"><div class="key">Freeze Authority</div><div class="val">${report.freezeAuthority}</div></div>
-        <div class="kv"><div class="key">Website</div><div class="val"><a href="${sanitizeUrl(report.website)}" target="_blank">${sanitizeUrl(report.website)}</a></div></div>
-        <p>${riskMsg}</p>
-        <img src="${riskGif}" class="gif-animated" style="width:200px; animation: jump 1s infinite alternate;" />
-        <hr>
-        <button onclick="exportPDF()">📄 Export PDF</button>
-        <button onclick="shareReport()">📢 Share Report</button>
-      </div>
+    // ---- Renderizar ----
+    document.getElementById("report").innerHTML = `
+      <h2>Token Report</h2>
+      <div class="kv"><span class="key">Name / Symbol:</span><span>${report.name} (${report.symbol})</span></div>
+      <div class="kv"><span class="key">Mint:</span><span>${mint}</span></div>
+      <div class="kv"><span class="key">Score:</span><span>${score}/100</span></div>
+      <div class="kv"><span class="key">Price:</span><span>${report.price}</span></div>
+      <div class="kv"><span class="key">24h Volume:</span><span>${report.volume24h}</span></div>
+      <div class="kv"><span class="key">Liquidity:</span><span>${report.liquidity}</span></div>
+      <div class="kv"><span class="key">Market Cap:</span><span>${report.marketCap}</span></div>
+      <div class="kv"><span class="key">Supply / Decimals:</span><span>${report.supply} / ${report.decimals}</span></div>
+      <div class="kv"><span class="key">Holders:</span><span>${report.holders}</span></div>
+      <div class="kv"><span class="key">Mint Authority:</span><span>${report.mintAuthority}</span></div>
+      <div class="kv"><span class="key">Freeze Authority:</span><span>${report.freezeAuthority}</span></div>
+      <div class="kv"><span class="key">Website:</span><span>${report.website}</span></div>
+      <p>${riskMsg}</p>
+      <img src="${riskGif}" class="gif-animated" style="width:200px; animation: jump 1s infinite alternate;" />
+      <hr>
+      <button onclick="exportPDF()">📄 Export PDF</button>
+      <button onclick="shareReport()">📢 Share Report</button>
     `;
-    document.getElementById("report").innerHTML = html;
 
     // ---- Atualiza links fixos ----
-    document.getElementById("btnOrca").href = `https://www.orca.so/?tokenIn=${mint}&tokenOut=So11111111111111111111111111111111111111112`;
-    document.getElementById("btnJupiter").href = `https://jup.ag/swap?sell=${mint}&buy=So11111111111111111111111111111111111111112`;
-    document.getElementById("btnDonate").href = `https://explorer.solana.com/address/${mint}`;
+    document.getElementById("btnOrca").href =
+      `https://www.orca.so/?tokenIn=${mint}&tokenOut=So11111111111111111111111111111111111111112`;
+    document.getElementById("btnJupiter").href =
+      `https://jup.ag/swap?sell=${mint}&buy=So11111111111111111111111111111111111111112`;
+    document.getElementById("btnDonate").href =
+      `https://explorer.solana.com/address/${mint}`;
 
-    // ---- Export / Share ----
     window.currentReport = { report, mint, score, riskMsg, riskGif };
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     document.getElementById("report").innerHTML = `❌ Error generating report. Check API keys.`;
   }
 }
 
-// ---- Export PDF placeholder -----------------------------------------------
+// ==========================
+// PDF e Compartilhar
+// ==========================
 function exportPDF() {
   alert("📄 PDF export coming soon!");
 }
 
-// ---- Share ----------------------------------------------------------------
 function shareReport() {
   const r = window.currentReport;
   if (!r) { alert("Generate report first!"); return; }
-  const text = buildShareText(r);
+  const text = `Token Report
+${r.report.name} (${r.report.symbol})
+Mint: ${r.mint}
+Score: ${r.score}/100
+Price: ${r.report.price}
+24h Volume: ${r.report.volume24h}
+Liquidity: ${r.report.liquidity}
+Market Cap: ${r.report.marketCap}
+Holders: ${r.report.holders}
+Mint Authority: ${r.report.mintAuthority}
+Freeze Authority: ${r.report.freezeAuthority}
+Website: ${r.report.website}
+${r.riskMsg}`;
+
   if (navigator.share) {
     navigator.share({ title:"Turbo Tuga Token Report", text, url:window.location.href });
   } else {
