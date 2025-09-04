@@ -85,7 +85,7 @@ It is not financial advice. Always DYOR.<br>
 <script src="config.js"></script>
 <script src="script.js"></script>
 <script>
-  // Observe quando o relatório é inserido e adiciona a animação
+  // Animação quando o relatório é inserido
   const reportDiv = document.getElementById("report");
   const observer = new MutationObserver(() => reportDiv.classList.add("show"));
   observer.observe(reportDiv, { childList: true, subtree: true });
