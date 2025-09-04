@@ -4,67 +4,89 @@
 <meta charset="UTF-8">
 <title>🐢 Turbo Tuga - Scam Detector</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-    background: #f9fafb;
-    color: #333;
-  }
-  h1 {
-    text-align: center;
-    color: #0f766e;
-    margin-bottom: 20px;
-  }
-  input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 16px;
-  }
-  button, .btn {
-    padding: 10px 15px;
-    margin: 5px;
-    background: #0f766e;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 14px;
-  }
-  button:hover, .btn:hover {
-    background: #115e59;
-  }
-  #report {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 20px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s ease;
-  }
-  #report.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .kv { display:flex; justify-content: space-between; margin:5px 0; }
-  .key { font-weight: bold; color: #0f766e; }
-  .val { text-align: right; }
-  .footer {
-    margin-top: 30px;
-    font-size: 0.8em;
-    text-align: center;
-    color: #555;
-  }
-  a { color: #0f766e; text-decoration: none; }
-  a:hover { text-decoration: underline; }
+body {
+  font-family: Arial, sans-serif;
+  max-width: 900px;
+  margin: 80px auto 20px auto;
+  padding: 20px;
+  background: #f9fafb;
+  color: #333;
+}
+h1 {
+  text-align: center;
+  color: #0f766e;
+  margin-bottom: 20px;
+}
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 16px;
+}
+button, .btn {
+  padding: 10px 15px;
+  margin: 5px;
+  background: #0f766e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+button:hover, .btn:hover { background: #115e59; }
+#report {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+#report.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.kv { display:flex; justify-content: space-between; margin:5px 0; }
+.key { font-weight: bold; color: #0f766e; }
+.val { text-align: right; }
+.gif-animated {
+  animation: jump 1s ease-in-out infinite;
+  display:block;
+  margin: 10px auto;
+  max-width: 300px;
+}
+@keyframes jump {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+#topLinks {
+  position: fixed;
+  top:0; left:0; right:0;
+  background:#0f766e; padding:10px;
+  text-align:center; z-index:999;
+}
+#topLinks a {
+  color:white; margin:0 10px;
+  text-decoration:none; font-weight:bold;
+}
+#topLinks a:hover { text-decoration: underline; }
+.footer {
+  margin-top: 30px;
+  font-size: 0.8em;
+  text-align: center;
+  color: #555;
+}
 </style>
 </head>
 <body>
+
+<div id="topLinks">
+  <a id="btnOrca" href="#" target="_blank">🛒 Buy on Orca</a>
+  <a id="btnJupiter" href="#" target="_blank">🛒 Buy on Jupiter</a>
+  <a id="btnDonate" href="#" target="_blank">💝 Donate</a>
+</div>
 
 <h1>🐢 Turbo Tuga - Scam Detector</h1>
 
@@ -85,11 +107,9 @@ It is not financial advice. Always DYOR.<br>
 <script src="config.js"></script>
 <script src="script.js"></script>
 <script>
-  // Animação quando o relatório é inserido
   const reportDiv = document.getElementById("report");
   const observer = new MutationObserver(() => reportDiv.classList.add("show"));
   observer.observe(reportDiv, { childList: true, subtree: true });
 </script>
-
 </body>
 </html>
