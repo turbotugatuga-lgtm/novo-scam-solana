@@ -1,48 +1,86 @@
 body {
-font-family: 'Comic Sans MS', cursive, sans-serif;
-margin:0; padding:0; text-align:center;
-background: linear-gradient(120deg,#ffe259,#ffa751);
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  background: linear-gradient(to right, #ffe259, #ffa751);
 }
 
 .topbar {
-background:#222; padding:10px; position:fixed; top:0; width:100%;
-display:flex; justify-content:center; gap:20px; z-index:1000;
+  background: #222;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  z-index: 1000;
 }
 
 .topbar a {
-color:#fff; text-decoration:none; font-weight:bold;
-padding:5px 10px; border-radius:8px; background:#ff3c3c; transition:0.3s;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #ff3c3c;
+  transition: 0.3s;
 }
-.topbar a:hover {background:#ff8080; transform:scale(1.1);}
 
-main {margin-top:90px; padding:20px;}
+.topbar a:hover {
+  background: #ff8080;
+}
+
+main {
+  margin-top: 90px;
+  padding: 20px;
+}
 
 #report {
-margin-top:20px; padding:20px; background:#fff; border-radius:15px;
-box-shadow:0 5px 20px rgba(0,0,0,0.4); text-align:left;
-animation: fadeIn 0.5s ease-in-out;
+  margin-top: 20px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  text-align: left;
 }
 
-@keyframes fadeIn {from{opacity:0} to{opacity:1}}
+#reportContent h2 {
+  text-align: center;
+  color: #ff3c3c;
+}
 
-#reportContent h2 {text-align:center; color:#ff3c3c; animation: bounce 0.8s infinite alternate;}
-
-@keyframes bounce {0%{transform:translateY(0)}100%{transform:translateY(-10px)}}
-
-.meme {margin-top:10px; max-width:200px; display:block; animation: spin 4s linear infinite;}
-@keyframes spin {0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.meme {
+  margin-top: 10px;
+  max-width: 200px;
+  display: block;
+}
 
 .table-score {
-width:100%; border-collapse:collapse; margin-top:15px; animation: slideIn 0.5s ease-in-out;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
 }
-@keyframes slideIn {from{opacity:0; transform:translateX(-50px)} to{opacity:1; transform:translateX(0)}}
 
-.table-score th, .table-score td {border:1px solid #ddd; padding:8px; text-align:center;}
-.table-score th {background-color:#ff3c3c; color:white;}
-.score-badge {font-weight:bold; padding:5px 10px; border-radius:8px;}
+.table-score th, .table-score td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
 
-.badge-scam {background:#ff4c4c; color:white; animation: pulse 1s infinite alternate;}
-.badge-medium {background:#ffd700; color:black; animation: pulse 1s infinite alternate;}
-.badge-safe {background:#4caf50; color:white; animation: pulse 1s infinite alternate;}
+.table-score th {
+  background-color: #ff3c3c;
+  color: white;
+}
 
-@keyframes pulse {0%{transform:scale(1)}100%{transform:scale(1.1)}}
+.score-badge {
+  font-weight: bold;
+  color: #222;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.badge-scam { background: #ff4c4c; color: white; }
+.badge-medium { background: #ffd700; color: black; }
+.badge-safe { background: #4caf50; color: white; }
