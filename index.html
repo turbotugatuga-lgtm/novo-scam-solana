@@ -30,12 +30,10 @@
   </main>
 
   <script>
-    // Lista de RPCs públicos (sem chave, aceitam front-end)
+    // Lista de RPCs públicos testados com CORS liberado
     const RPC_ENDPOINTS = [
-      "https://api.mainnet-beta.solana.com",
       "https://rpc.ankr.com/solana",
-      "https://rpc.solana.fyi",
-      "https://solana-api.projectserum.com"
+      "https://rpc.solana.fyi"
     ];
 
     let currentRpc = 0;
@@ -52,14 +50,13 @@
         return await fn();
       } catch(err){
         console.warn("Erro RPC:", err.message);
+        if (err.message.includes("403")) {
+          alert("❌ O RPC bloqueou o acesso direto do navegador. Configure um proxy ou use outro RPC.");
+        }
         switchRpc();
         throw err;
       }
     }
-
-    const TOKEN_METADATA_PROGRAM_ID = new solanaWeb3.PublicKey(
-      "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-    );
 
     const memes = [
       "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
