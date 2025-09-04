@@ -20,13 +20,36 @@ function sanitizeUrl(u) {
   return u;
 }
 
-function pickRiskGif(score) {
-  let gif = "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif"; // médio
-  if (score < 40) gif = "https://media.giphy.com/media/ROF8OQvDmxytW/giphy.gif"; // alto risco
-  if (score > 80) gif = "https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif"; // baixo risco
-  return gif;
+// ---- GIFs por nível de risco -----------------------------------------------
+const gifs = {
+  high: [
+    "https://media.giphy.com/media/ROF8OQvDmxytW/giphy.gif",
+    "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif"
+  ],
+  medium: [
+    "https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif",
+    "https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif"
+  ],
+  low: [
+    "https://media.giphy.com/media/3orieYxFwPfaW5n4Ck/giphy.gif",
+    "https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif"
+  ]
+};
+
+function pickRandomGif(score) {
+  let arr = gifs.medium;
+  if(score < 40) arr = gifs.high;
+  if(score > 80) arr = gifs.low;
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
+function pickScoreColor(score) {
+  if(score < 40) return "red";
+  if(score > 80) return "green";
+  return "orange";
+}
+
+// ---- Construir texto para compartilhar ------------------------------------
 function buildShareText({report, mint, score, riskMsg, riskGif}) {
   const lines = [
     "🚨 Turbo Tuga Token Report",
@@ -153,7 +176,7 @@ async function generateReport() {
   let riskMsg = "⚠️ Medium risk — caution advised";
   if (score < 40) riskMsg = "❌ High risk — possible scam!";
   if (score > 80) riskMsg = "✅ Low risk — safer token";
-  const riskGif = pickRiskGif(score);
+  const riskGif = pickRandomGif(score);
 
   // ---- Render ------------------------------------------------------------
   const html = `
@@ -161,8 +184,8 @@ async function generateReport() {
       <h2>Token Report</h2>
       <div class="kv"><div class="key">Name / Symbol</div><div class="val"><b>${report.name}</b> (${report.symbol})</div></div>
       <div class="kv"><div class="key">Mint</div><div class="val">${mint}</div></div>
-      <div class="kv"><div class="key">Score</div><div class="val"><b>${score}/100</b></div></div>
-      <div class="kv"><div class="key">Price</div><div class="val">${fmt(report.price)}${report.price!=="N/A" ? " USD" : ""}</div></div>
+      <div class="kv"><div class="key">Score</div><div class="val" style="color:${pickScoreColor(score)};"><b>${score}/100</b></div></div>
+      <div class="kv"><div class="key">Price</div><div class="val">${fmt(report.price)}</div></div>
       <div class="kv"><div class="key">24h Volume</div><div class="val">${fmt(report.volume24h)}</div></div>
       <div class="kv"><div class="key">Liquidity</div><div class="val">${fmt(report.liquidity)}</div></div>
       <div class="kv"><div class="key">Market Cap</div><div class="val">${fmt(report.marketCap)}</div></div>
@@ -170,38 +193,38 @@ async function generateReport() {
       <div class="kv"><div class="key">Holders</div><div class="val">${fmt(report.holders)}</div></div>
       <div class="kv"><div class="key">Mint Authority</div><div class="val">${report.mintAuthority}</div></div>
       <div class="kv"><div class="key">Freeze Authority</div><div class="val">${report.freezeAuthority}</div></div>
-      <div class="kv"><div class="key">Website</div><div class="val">${report.website !== "N/A" ? `<a href="${sanitizeUrl(report.website)}" target="_blank">${report.website}</a>` : "N/A"}</div></div>
-      ${report.socials.length ? `<div class="kv"><div class="key">Socials</div><div class="val">${report.socials.map(s => `<a href="${sanitizeUrl(s)}" target="_blank">${s}</a>`).join("<br>")}</div></div>` : ""}
+      <div class="kv"><div class="key">Website</div><div class="val"><a href="${sanitizeUrl(report.website)}" target="_blank">${sanitizeUrl(report.website)}</a></div></div>
       <p>${riskMsg}</p>
-      <img src="${riskGif}" alt="Risk Meme" style="max-width:300px;margin:10px auto;display:block;" />
-      <div style="margin-top:15px;">
-        <button onclick="exportPDF()">📄 Export PDF</button>
-        <button onclick="shareReport()">📢 Share Report</button>
-        <a href="https://www.orca.so/?tokenIn=${mint}&tokenOut=So11111111111111111111111111111111111111112" target="_blank"><button>🛒 Buy on Orca</button></a>
-        <a href="https://jup.ag/swap?sell=${mint}&buy=So11111111111111111111111111111111111111112" target="_blank"><button>🛒 Buy on Jupiter</button></a>
-        <a href="https://explorer.solana.com/address/${mint}" target="_blank"><button>💝 Donate</button></a>
-      </div>
+      <img src="${riskGif}" class="gif-animated" />
+      <hr>
+      <button onclick="exportPDF()">📄 Export PDF</button>
+      <button onclick="shareReport()">📢 Share Report</button>
     </div>
   `;
-  document.getElementById("report").innerHTML = html;
-  document.getElementById("report").classList.add("show");
+  reportDiv.innerHTML = html;
 
-  window.shareText = buildShareText({report, mint, score, riskMsg, riskGif});
+  // ---- Atualiza links fixos ------------------------------------------------
+  document.getElementById("btnOrca").href = `https://www.orca.so/?tokenIn=${mint}&tokenOut=So11111111111111111111111111111111111111112`;
+  document.getElementById("btnJupiter").href = `https://jup.ag/swap?sell=${mint}&buy=So11111111111111111111111111111111111111112`;
+  document.getElementById("btnDonate").href = `https://explorer.solana.com/address/${mint}`;
+
+  // ---- Export / Share ------------------------------------------------------
+  window.currentReport = { report, mint, score, riskMsg, riskGif };
 }
 
-// ---- PDF / Share -----------------------------------------------------------
+// ---- Export PDF placeholder -----------------------------------------------
 function exportPDF() {
   alert("📄 PDF export coming soon!");
 }
 
+// ---- Share ----------------------------------------------------------------
 function shareReport() {
+  const r = window.currentReport;
+  if (!r) { alert("Generate report first!"); return; }
+  const text = buildShareText(r);
   if (navigator.share) {
-    navigator.share({
-      title: "Turbo Tuga Token Report",
-      text: window.shareText,
-      url: window.location.href
-    });
+    navigator.share({ title:"Turbo Tuga Token Report", text, url:window.location.href });
   } else {
-    navigator.clipboard.writeText(window.shareText).then(() => alert("Report copied to clipboard!"));
+    prompt("Copy report text:", text);
   }
 }
