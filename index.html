@@ -1,43 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>🐢 Turbo Tuga - Scam Detector</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<title>🐢 Turbo Tuga - Scam Detector</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    background: #f9fafb;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    color: #0f766e;
+    margin-bottom: 20px;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 16px;
+  }
+  button, .btn {
+    padding: 10px 15px;
+    margin: 5px;
+    background: #0f766e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  button:hover, .btn:hover {
+    background: #115e59;
+  }
+  #report {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+  }
+  #report.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .kv { display:flex; justify-content: space-between; margin:5px 0; }
+  .key { font-weight: bold; color: #0f766e; }
+  .val { text-align: right; }
+  .footer {
+    margin-top: 30px;
+    font-size: 0.8em;
+    text-align: center;
+    color: #555;
+  }
+  a { color: #0f766e; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
 </head>
 <body>
-  <h1>🐢 Turbo Tuga - Scam Detector</h1>
-  <p>Enter the token mint address (SPL) below to generate a full risk analysis report.</p>
 
-  <input type="text" id="tokenInput" placeholder="Paste token mint address (e.g. So111...)" />
-  <button id="btnGen" onclick="generateReport()">🔍 Generate Report</button>
+<h1>🐢 Turbo Tuga - Scam Detector</h1>
 
-  <!-- Ações fixas -->
-  <div class="links">
-    <a class="btn" href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank" rel="noopener">🛒 Buy Turbo Tuga on Orca</a>
-    <a class="btn" href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank" rel="noopener">🛒 Buy Turbo Tuga on Jupiter</a>
-    <a class="btn" href="https://explorer.solana.com/address/2NERt9zLBG2tKbcPXwfBYsRrPhFMVAxpR6ajfeEWeJSB" target="_blank" rel="noopener">💝 Donate to Turbo Tuga</a>
-  </div>
+<p>Enter the token mint address (SPL) below to generate a full risk analysis report.</p>
 
-  <div id="report" class="report">
-    <!-- relatório renderiza aqui -->
-  </div>
+<input type="text" id="tokenInput" placeholder="Paste token mint address" size="60">
+<br>
+<button onclick="generateReport()">🔍 Generate Report</button>
 
-  <div class="footer">
-    ⚠️ This automated analysis is for educational purposes only. It is not financial advice. Always DYOR.<br>
-    © Turbo Tuga Detector — Powered by Shyft + Solscan + Birdeye + Jupiter
-  </div>
+<div id="report"></div>
 
-  <script>
-    // 🔑 API keys configuration (use as config central)
-    window.CONFIG = {
-      SHYFT_API_KEY: "VzPp9y_hw4dFfmfF",
-      BIRDEYE_API_KEY: "22febf5b37e34452af2cc632dff69b88"
-    };
-  </script>
-  <!-- Lib PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-YcsIPfQY6z9b9s1Y9lqgN9tNq3zNqT2fD8uKjH0iY0m2tJxwNnG0+5dEoT8v6v8uV2X9Y6AqPj7x2P5hVQjD5A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="script.js"></script>
+<div class="footer">
+⚠️ This automated analysis is for educational purposes only.<br>
+It is not financial advice. Always DYOR.<br>
+© Turbo Tuga Detector — Powered by Shyft + Birdeye + Jupiter
+</div>
+
+<script src="config.js"></script>
+<script src="script.js"></script>
+<script>
+  // Observe quando o relatório é inserido e adiciona a animação
+  const reportDiv = document.getElementById("report");
+  const observer = new MutationObserver(() => reportDiv.classList.add("show"));
+  observer.observe(reportDiv, { childList: true, subtree: true });
+</script>
+
 </body>
 </html>
