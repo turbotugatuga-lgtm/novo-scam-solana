@@ -74,13 +74,13 @@ async function generateReport() {
     if (report.liquidity === "N/A" || report.liquidity < 1000) score -= 15;
 
     let riskMsg = "⚠️ Medium risk — caution advised";
-    let riskEmoji = "😐";
+    let riskGif = "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif"; // Doge confuso
     if (score < 40) {
       riskMsg = "❌ High risk — possible scam!";
-      riskEmoji = "😭";
+      riskGif = "https://media.giphy.com/media/ROF8OQvDmxytW/giphy.gif"; // Pepe chorando
     } else if (score > 80) {
       riskMsg = "✅ Low risk — safer token";
-      riskEmoji = "🚀";
+      riskGif = "https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif"; // Elon Musk foguete
     }
 
     // --- Render ---
@@ -98,7 +98,9 @@ async function generateReport() {
       <p><b>Mint authority:</b> ${report.mintAuthority}</p>
       <p><b>Freeze authority:</b> ${report.freezeAuthority}</p>
       <p>${riskMsg}</p>
-      <div class="emoji">${riskEmoji}</div>
+      <div style="text-align:center; margin:15px 0;">
+        <img src="${riskGif}" alt="Risk meme" style="max-width:250px; border-radius:12px;">
+      </div>
       <hr>
       <button onclick="exportPDF()">📄 Export PDF</button>
       <button onclick="shareReport()">📢 Share Report</button>
