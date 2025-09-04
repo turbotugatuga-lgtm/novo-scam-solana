@@ -2,7 +2,6 @@
 function fmt(v) {
   if (v === null || v === undefined || v === "N/A") return "N/A";
   if (typeof v === "number") {
-    // human friendly
     if (v >= 1e12) return (v/1e12).toFixed(2) + " T";
     if (v >= 1e9)  return (v/1e9).toFixed(2) + " B";
     if (v >= 1e6)  return (v/1e6).toFixed(2) + " M";
@@ -15,7 +14,7 @@ function fmt(v) {
 function sanitizeUrl(u) {
   if (!u) return "N/A";
   if (typeof u !== "string") return "N/A";
-  if (!/^https?:\/\//i.test(u)) return u; // show as is if missing protocol
+  if (!/^https?:\/\//i.test(u)) return u;
   return u;
 }
 
@@ -45,19 +44,21 @@ function buildShareText({report, mint, score, riskMsg, riskGif}) {
 }
 
 function pickRiskGif(score) {
-  // médio padrão (doge confuso)
   let gif = "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif";
-  if (score < 40) {
-    gif = "https://media.giphy.com/media/ROF8OQvDmxytW/giphy.gif"; // pepe chorando
-  } else if (score > 80) {
-    gif = "https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif"; // musk rocket
-  }
+  if (score < 40) gif = "https://media.giphy.com/media/ROF8OQvDmxytW/giphy.gif";
+  if (score > 80) gif = "https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif";
   return gif;
 }
 
 // ---- Main ------------------------------------------------------------------
 async function generateReport() {
-  const mint = document.getElementById("tokenInput").value.trim();
+  let mintRaw = document.getElementById("tokenInput").value.trim();
+  
+  // Remove parâmetros de URL e extrações
+  if (mintRaw.includes("?")) mintRaw = mintRaw.split("?")[1]; 
+  if (mintRaw.includes("&")) mintRaw = mintRaw.split("&")[0]; 
+  const mint = mintRaw; // mint puro
+  
   if (!mint) {
     alert("Please enter a token mint address.");
     return;
@@ -107,9 +108,7 @@ async function generateReport() {
       }
       shyftOk = true;
     }
-  } catch (e) {
-    console.warn("Shyft error", e);
-  }
+  } catch (e) { console.warn("Shyft error", e); }
 
   // ---- 2) Solscan fallback (metadata) -------------------------------------
   if (!shyftOk) {
@@ -123,18 +122,12 @@ async function generateReport() {
         report.supply = (s.totalSupply ?? s.supply) ?? report.supply;
         report.holders = s.holder ?? report.holders;
         if (s.website) report.website = s.website;
-        if (Array.isArray(s.socials)) {
-          // sometimes solscan returns array of links
-          s.socials.forEach(link => report.socials.push(link));
-        }
+        if (Array.isArray(s.socials)) s.socials.forEach(link => report.socials.push(link));
       }
-    } catch (e) {
-      console.warn("Solscan error", e);
-    }
+    } catch (e) { console.warn("Solscan error", e); }
   }
 
   // ---- 3) Birdeye (market data) -------------------------------------------
-  let birdeyeOk = false;
   if (birdeyeKey) {
     try {
       const beRes = await fetch(
@@ -147,42 +140,18 @@ async function generateReport() {
         report.volume24h = be.data.volume24h ?? report.volume24h;
         report.liquidity = be.data.liquidity ?? report.liquidity;
         report.marketCap = be.data.mc ?? report.marketCap;
-        birdeyeOk = true;
       }
-    } catch (e) {
-      console.warn("Birdeye overview error", e);
-    }
-
-    // price endpoint (optional refine)
-    if (!birdeyeOk) {
-      try {
-        const bePriceRes = await fetch(
-          `https://public-api.birdeye.so/defi/token_price?address=${mint}`,
-          { headers: { "X-API-KEY": birdeyeKey } }
-        );
-        const beP = await bePriceRes.json();
-        if (beP?.success && beP?.data) {
-          report.price = beP.data.value ?? report.price;
-        }
-      } catch (e) {
-        console.warn("Birdeye price error", e);
-      }
-    }
+    } catch (e) { console.warn("Birdeye overview error", e); }
   }
 
   // ---- 4) Jupiter price fallback ------------------------------------------
   try {
     const jupRes = await fetch(`https://price.jup.ag/v4/price?ids=${mint}`);
     const jup = await jupRes.json();
-    if (jup?.data && jup.data[mint]) {
-      report.price = jup.data[mint].price ?? report.price;
-    }
-  } catch (e) {
-    console.warn("Jupiter price fetch failed", e);
-  }
+    if (jup?.data && jup.data[mint]) report.price = jup.data[mint].price ?? report.price;
+  } catch (e) { console.warn("Jupiter price fetch failed", e); }
 
-  // ---- Score calculation ---------------------------------------------------
-  // Base 65, penalizações e bônus
+  // ---- Score ---------------------------------------------------------------
   let score = 65;
   if (report.mintAuthority !== "Revoked") score -= 20;
   if (report.freezeAuthority !== "None") score -= 10;
@@ -197,15 +166,12 @@ async function generateReport() {
   if (!isNaN(liqNum)) {
     if (liqNum < 1000) score -= 15;
     if (liqNum > 100000) score += 10;
-  } else {
-    score -= 10; // sem liquidez informada
-  }
+  } else score -= 10;
 
   if (report.supply !== "N/A" && report.decimals !== "N/A") score += 5;
   if (score < 0) score = 0;
   if (score > 100) score = 100;
 
-  // Mensagem + GIF
   let riskMsg = "⚠️ Medium risk — caution advised";
   if (score < 40) riskMsg = "❌ High risk — possible scam!";
   if (score > 80) riskMsg = "✅ Low risk — safer token";
@@ -213,8 +179,7 @@ async function generateReport() {
 
   // ---- Render --------------------------------------------------------------
   const socialsHtml = (report.socials && report.socials.length)
-    ? `<div class="kv"><div class="key">Socials</div><div class="val">${report.socials.map(s => `<a href="${sanitizeUrl(s)}" target="_blank" rel="noopener">${s}</a>`).join("<br>")}</div></div>`
-    : "";
+    ? `<div class="kv"><div class="key">Socials</div><div class="val">${report.socials.map(s => `<a href="${sanitizeUrl(s)}" target="_blank">${s}</a>`).join("<br>")}</div></div>` : "";
 
   const html = `
     <div id="reportContent">
@@ -230,125 +195,5 @@ async function generateReport() {
       <div class="kv"><div class="key">Holders</div><div class="val">${fmt(report.holders)}</div></div>
       <div class="kv"><div class="key">Mint Authority</div><div class="val">${report.mintAuthority}</div></div>
       <div class="kv"><div class="key">Freeze Authority</div><div class="val">${report.freezeAuthority}</div></div>
-      <div class="kv"><div class="key">Website</div><div class="val">${report.website !== "N/A" ? `<a href="${sanitizeUrl(report.website)}" target="_blank" rel="noopener">${report.website}</a>` : "N/A"}</div></div>
-      ${socialsHtml}
-      <hr />
-      <div class="kv"><div class="key">Risk</div><div class="val">${riskMsg}</div></div>
-      <div class="meme"><img src="${riskGif}" alt="Risk meme"></div>
-
-      <div class="note">
-        <b>How we score:</b><br>
-        Base 65. Penalties: Mint Authority active (-20), Freeze Authority active (-10), Holders &lt; 50 (-20), Liquidity &lt; $1,000 (-15).<br>
-        Bonuses: Liquidity &gt; $100k (+10), Holders &gt; 500 (+10), Supply/Decimals valid (+5).
-      </div>
-    </div>
-
-    <hr />
-    <div class="actions">
-      <button onclick="exportPDF()">📄 Export PDF</button>
-      <button onclick="shareNative()">📢 Share (Native)</button>
-      <button onclick='shareTwitter(${JSON.stringify(mint)}, ${score}, ${JSON.stringify(riskGif)})'>🐦 Twitter</button>
-      <button onclick='shareTelegram(${JSON.stringify(mint)}, ${score}, ${JSON.stringify(riskGif)})'>📲 Telegram</button>
-      <button onclick='copyFullReport(${JSON.stringify(mint)}, ${score}, ${JSON.stringify(riskMsg)}, ${JSON.stringify(riskGif)})'>📋 Copy full report</button>
-    </div>
-  `;
-
-  document.getElementById("report").innerHTML = html;
-}
-
-// ---- PDF export ------------------------------------------------------------
-function exportPDF() {
-  const el = document.getElementById("reportContent");
-  const opt = {
-    margin: 0.5,
-    filename: "TurboTuga-Token-Report.pdf",
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true }, // tenta carregar GIF externo
-    jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
-  };
-  html2pdf().set(opt).from(el).save();
-}
-
-// ---- Share (Native) --------------------------------------------------------
-function shareNative() {
-  const mint = document.getElementById("tokenInput").value.trim();
-  const rc = document.getElementById("reportContent");
-  if (!rc) return alert("Generate a report first.");
-  const text = rc.innerText;
-  if (navigator.share) {
-    navigator.share({ title: "Turbo Tuga Token Report", text, url: location.href })
-      .catch(err => console.warn("Share cancelled/failed", err));
-  } else {
-    alert("Native share not supported here. Use Twitter/Telegram buttons.");
-  }
-}
-
-// ---- Share Twitter/Telegram (texto + link do GIF) --------------------------
-function shareTwitter(mint, score, riskGif) {
-  const report = extractCurrentReport();
-  const text = buildShareText({report, mint, score, riskMsg: getRiskMsgFromDOM(), riskGif});
-  const url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text);
-  window.open(url, "_blank", "noopener");
-}
-
-function shareTelegram(mint, score, riskGif) {
-  const report = extractCurrentReport();
-  const text = buildShareText({report, mint, score, riskMsg: getRiskMsgFromDOM(), riskGif});
-  const url = `https://t.me/share/url?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent(text)}`;
-  window.open(url, "_blank", "noopener");
-}
-
-// ---- Copy full report to clipboard ----------------------------------------
-async function copyFullReport(mint, score, riskMsg, riskGif) {
-  const report = extractCurrentReport();
-  const text = buildShareText({report, mint, score, riskMsg, riskGif});
-  try {
-    await navigator.clipboard.writeText(text);
-    alert("Report copied to clipboard! Paste it anywhere.");
-  } catch (e) {
-    console.warn(e);
-    alert("Could not copy. Your browser may block clipboard access.");
-  }
-}
-
-// ---- Extract current report from DOM (for sharing) -------------------------
-function extractCurrentReport() {
-  // tries to read rendered values back from DOM for consistency
-  const kv = (key) => {
-    const rows = document.querySelectorAll("#reportContent .kv");
-    for (const row of rows) {
-      const k = row.querySelector(".key")?.innerText?.trim();
-      const v = row.querySelector(".val")?.innerText?.trim();
-      if (k && v && k.toLowerCase().includes(key.toLowerCase())) return v;
-    }
-    return "N/A";
-  };
-  const socialsNodes = document.querySelectorAll("#reportContent .kv .val a");
-  const socials = Array.from(socialsNodes).map(a => a.href);
-
-  return {
-    name: kv("Name").split("(")[0]?.trim() || "Unknown",
-    symbol: (kv("Name").match(/\((.*?)\)/)?.[1]) || "Unknown",
-    price: kv("Price"),
-    volume24h: kv("24h Volume"),
-    liquidity: kv("Liquidity"),
-    marketCap: kv("Market Cap"),
-    supply: kv("Supply / Decimals").split("/")[0]?.trim() || "N/A",
-    decimals: kv("Supply / Decimals").split("/")[1]?.trim() || "N/A",
-    holders: kv("Holders"),
-    mintAuthority: kv("Mint Authority"),
-    freezeAuthority: kv("Freeze Authority"),
-    website: kv("Website"),
-    socials
-  };
-}
-
-function getRiskMsgFromDOM() {
-  const rows = document.querySelectorAll("#reportContent .kv");
-  for (const row of rows) {
-    const k = row.querySelector(".key")?.innerText?.trim();
-    const v = row.querySelector(".val")?.innerText?.trim();
-    if (k && v && k.toLowerCase().includes("risk")) return v;
-  }
-  return "";
-}
+      <div class="kv"><div class="key">Website</div><div class="val">${report.website !== "N/A" ? `<a href="${sanitizeUrl(report.website)}" target="_blank">${report.website}</a>` : "N/A"}</div></div>
+      ${socials
