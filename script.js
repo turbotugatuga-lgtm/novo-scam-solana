@@ -76,14 +76,38 @@ async function generateReport() {
     if (report.liquidity !== "N/A" && report.liquidity > 10000) score += 10;
     if (report.mintAuthority === "Revoked") score += 5;
 
-    // --- Seleciona GIF aleatório ---
+    // --- Lista de 30 GIFs engraçados ---
     const gifs = [
       "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
       "https://media.giphy.com/media/l3vR85PnGsBwu1PFK/giphy.gif",
       "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
       "https://media.giphy.com/media/xT5LMzIK1AdZJ2y2dC/giphy.gif",
       "https://media.giphy.com/media/jUwpNzg9IcyrK/giphy.gif",
-      "https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif"
+      "https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif",
+      "https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif",
+      "https://media.giphy.com/media/13CoXDiaCcCoyk/giphy.gif",
+      "https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif",
+      "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+      "https://media.giphy.com/media/l4KibWpBGWchSqCRy/giphy.gif",
+      "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+      "https://media.giphy.com/media/26u4hLq6uB6D4jUuk/giphy.gif",
+      "https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif",
+      "https://media.giphy.com/media/26n6xBpxNXExDfuKk/giphy.gif",
+      "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
+      "https://media.giphy.com/media/3o7aD4K2kpkj8cYFLO/giphy.gif",
+      "https://media.giphy.com/media/3o6Zt8MgUuvSbkZYWc/giphy.gif",
+      "https://media.giphy.com/media/xUPGcguWZHRC2HyBRS/giphy.gif",
+      "https://media.giphy.com/media/3o7aCTfyhYawdOXcFW/giphy.gif",
+      "https://media.giphy.com/media/xT9IgIc0lryrxvqVGM/giphy.gif",
+      "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif",
+      "https://media.giphy.com/media/xT9IgIc0lryrxvqVGM/giphy.gif",
+      "https://media.giphy.com/media/3o7TKQb2g2y5PNeHFS/giphy.gif",
+      "https://media.giphy.com/media/xT9IgGKHj7KnwS0wA0/giphy.gif",
+      "https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif",
+      "https://media.giphy.com/media/3o7TKtnuHOHHUjR38Y/giphy.gif",
+      "https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif",
+      "https://media.giphy.com/media/26gR1K3H4wbG5P2Zy/giphy.gif",
+      "https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif"
     ];
     const randomGif = gifs[Math.floor(Math.random() * gifs.length)];
 
@@ -102,7 +126,7 @@ async function generateReport() {
       <p><b>Mint authority:</b> ${report.mintAuthority}</p>
       <p><b>Freeze authority:</b> ${report.freezeAuthority}</p>
       <p><b>Website:</b> ${report.website}</p>
-      <div class="gif-box"><img src="${randomGif}" width="250"></div>
+      <div class="gif-box"><img src="${randomGif}" width="300"></div>
       <hr>
       <button onclick="exportPDF()">📄 Exportar PDF</button>
       <button onclick="shareReport()">📢 Compartilhar</button>
@@ -113,7 +137,7 @@ async function generateReport() {
   }
 }
 
-// --- Export PDF (simplificado) ---
+// --- Export PDF (placeholder) ---
 function exportPDF() {
   alert("📄 Export PDF será implementado futuramente.");
 }
