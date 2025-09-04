@@ -19,7 +19,9 @@ async function generateReport() {
     price: "N/A",
     volume24h: "N/A",
     liquidity: "N/A",
-    marketCap: "N/A"
+    marketCap: "N/A",
+    website: "N/A",
+    socials: []
   };
 
   try {
@@ -38,9 +40,15 @@ async function generateReport() {
       report.mintAuthority = d.mint_authority || "Revoked";
       report.freezeAuthority = d.freeze_authority || "None";
       report.holders = d.holder || "N/A";
+      report.website = d.extensions?.website || "N/A";
+      if (d.extensions) {
+        if (d.extensions.twitter) report.socials.push(`Twitter: ${d.extensions.twitter}`);
+        if (d.extensions.discord) report.socials.push(`Discord: ${d.extensions.discord}`);
+        if (d.extensions.telegram) report.socials.push(`Telegram: ${d.extensions.telegram}`);
+      }
     }
 
-    // --- Birdeye (opcional) ---
+    // --- Birdeye ---
     if (birdeyeKey) {
       const beRes = await fetch(
         `https://public-api.birdeye.so/defi/token_overview?address=${mint}`,
@@ -66,12 +74,15 @@ async function generateReport() {
       console.warn("Jupiter price fetch failed", e);
     }
 
-    // --- Risk Score ---
+    // --- Score calculation ---
     let score = 65;
     if (report.mintAuthority !== "Revoked") score -= 20;
     if (report.freezeAuthority !== "None") score -= 10;
     if (report.holders !== "N/A" && report.holders < 50) score -= 20;
     if (report.liquidity === "N/A" || report.liquidity < 1000) score -= 15;
+    if (report.liquidity !== "N/A" && report.liquidity > 100000) score += 10;
+    if (report.holders !== "N/A" && report.holders > 500) score += 10;
+    if (report.supply !== "N/A" && report.decimals !== "N/A") score += 5;
 
     let riskMsg = "⚠️ Medium risk — caution advised";
     let riskGif = "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif"; // Doge confuso
@@ -98,6 +109,8 @@ async function generateReport() {
         <p><b>Holders:</b> ${report.holders}</p>
         <p><b>Mint authority:</b> ${report.mintAuthority}</p>
         <p><b>Freeze authority:</b> ${report.freezeAuthority}</p>
+        <p><b>Website:</b> ${report.website}</p>
+        ${report.socials.length ? `<p><b>Socials:</b><br>${report.socials.join("<br>")}</p>` : ""}
         <p>${riskMsg}</p>
         <div style="text-align:center; margin:15px 0;">
           <img src="${riskGif}" alt="Risk meme" style="max-width:250px; border-radius:12px;">
@@ -105,7 +118,9 @@ async function generateReport() {
       </div>
       <hr>
       <button onclick="exportPDF()">📄 Export PDF</button>
-      <button onclick="shareReport()">📢 Share Report</button>
+      <button onclick="shareReport()">📢 Share Report (Native)</button>
+      <button onclick="shareTwitter('${mint}', ${score})">🐦 Twitter</button>
+      <button onclick="shareTelegram('${mint}', ${score})">📲 Telegram</button>
     `;
   } catch (err) {
     console.error(err);
@@ -126,7 +141,7 @@ function exportPDF() {
   html2pdf().set(opt).from(element).save();
 }
 
-// --- Share API ---
+// --- Native Share ---
 function shareReport() {
   if (navigator.share) {
     navigator.share({
@@ -137,4 +152,18 @@ function shareReport() {
   } else {
     alert("Sharing not supported on this device.");
   }
+}
+
+// --- Twitter Share ---
+function shareTwitter(mint, score) {
+  const text = encodeURIComponent(`🚀 Turbo Tuga Token Report\nMint: ${mint}\nScore: ${score}/100\nCheck if it's safe or scam! 🐢`);
+  const url = `https://twitter.com/intent/tweet?text=${text}`;
+  window.open(url, "_blank");
+}
+
+// --- Telegram Share ---
+function shareTelegram(mint, score) {
+  const text = encodeURIComponent(`🚀 Turbo Tuga Token Report\nMint: ${mint}\nScore: ${score}/100\nCheck if it's safe or scam! 🐢`);
+  const url = `https://t.me/share/url?url=${window.location.href}&text=${text}`;
+  window.open(url, "_blank");
 }
