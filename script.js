@@ -50,12 +50,16 @@ async function generateReport() {
       }
     }
 
-    // --- Jupiter (price fallback) ---
-    const jupRes = await fetch(`https://price.jup.ag/v6/price?ids=${mint}`);
-    const jupData = await jupRes.json();
-    if (jupData.data && jupData.data[mint]) {
-      report.price = jupData.data[mint].price || report.price;
-    }
+// --- Jupiter (price fallback) ---
+try {
+  const jupRes = await fetch(`https://price.jup.ag/v4/price?ids=${mint}`);
+  const jupData = await jupRes.json();
+  if (jupData.data && jupData.data[mint]) {
+    report.price = jupData.data[mint].price || report.price;
+  }
+} catch (e) {
+  console.warn("Jupiter price fetch failed", e);
+}
 
     // --- Render ---
     document.getElementById("report").innerHTML = `
