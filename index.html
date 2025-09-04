@@ -3,17 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>🐢 Turbo Tuga - Scam Detector</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#f8f9fa; color:#222; text-align:center; }
-    h1 { color:#2c3e50; }
-    input, button { padding:10px; margin:5px; border-radius:8px; border:1px solid #ccc; }
-    button { background:#27ae60; color:#fff; cursor:pointer; }
-    button:hover { background:#219150; }
-    .report { text-align:left; margin:20px auto; max-width:600px; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
-    .footer { margin-top:20px; font-size:12px; color:#666; }
-    .links a { display:block; margin:8px 0; color:#007bff; text-decoration:none; }
-    .links a:hover { text-decoration:underline; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>🐢 Turbo Tuga - Scam Detector</h1>
@@ -25,19 +15,19 @@
 
   <div id="report" class="report"></div>
 
-  <div class="links">
-    <a href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">🛒 Buy Turbo Tuga on Orca</a>
-    <a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">🛒 Buy Turbo Tuga on Jupiter</a>
-    <a href="https://explorer.solana.com/address/2NERt9zLBG2tKbcPXwfBYsRrPhFMVAxpR6ajfeEWeJSB" target="_blank">💝 Donate to Turbo Tuga</a>
-  </div>
-
   <div class="footer">
     ⚠️ This automated analysis is for educational purposes only.<br>
     It is not financial advice. Always DYOR.<br>
-    © Turbo Tuga Detector — Powered by Shyft + Birdeye + Jupiter
+    © Turbo Tuga Detector — Powered by Shyft + Jupiter
   </div>
 
-  <script src="config.js"></script>
+  <script>
+    // 🔑 API keys configuration
+    window.CONFIG = {
+      SHYFT_API_KEY: "VzPp9y_hw4dFfmfF",   // Your Shyft API key
+      BIRDEYE_API_KEY: ""                  // optional
+    };
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
