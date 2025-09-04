@@ -196,4 +196,39 @@ async function generateReport() {
       <div class="kv"><div class="key">Mint Authority</div><div class="val">${report.mintAuthority}</div></div>
       <div class="kv"><div class="key">Freeze Authority</div><div class="val">${report.freezeAuthority}</div></div>
       <div class="kv"><div class="key">Website</div><div class="val">${report.website !== "N/A" ? `<a href="${sanitizeUrl(report.website)}" target="_blank">${report.website}</a>` : "N/A"}</div></div>
-      ${socials
+      ${socialsHtml}
+      <p>${riskMsg}</p>
+      <img src="${riskGif}" alt="Risk Meme" style="max-width:300px;margin:10px auto;display:block;" />
+      <div style="margin-top:15px;">
+        <button onclick="exportPDF()">📄 Export PDF</button>
+        <button onclick="shareReport()">📢 Share Report</button>
+        <a href="https://www.orca.so/?tokenIn=${mint}&tokenOut=So11111111111111111111111111111111111111112" target="_blank"><button>🛒 Buy on Orca</button></a>
+        <a href="https://jup.ag/swap?sell=${mint}&buy=So11111111111111111111111111111111111111112" target="_blank"><button>🛒 Buy on Jupiter</button></a>
+        <a href="https://explorer.solana.com/address/${mint}" target="_blank"><button>💝 Donate</button></a>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("report").innerHTML = html;
+
+  // ---- Share text for social ------------------------------------------------
+  window.shareText = buildShareText({report, mint, score, riskMsg, riskGif});
+}
+
+// ---- PDF / Share -----------------------------------------------------------
+function exportPDF() {
+  alert("📄 PDF export coming soon!");
+}
+
+function shareReport() {
+  if (navigator.share) {
+    navigator.share({
+      title: "Turbo Tuga Token Report",
+      text: window.shareText,
+      url: window.location.href
+    });
+  } else {
+    // fallback copy
+    navigator.clipboard.writeText(window.shareText).then(() => alert("Report copied to clipboard!"));
+  }
+}
