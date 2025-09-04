@@ -1,21 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Turbo Tuga Scam Analyzer</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; text-align:center; background:#f4f6f8; }
-    header { background:#111; padding:10px; position:fixed; top:0; width:100%; display:flex; justify-content:center; gap:20px; z-index:1000; }
-    header a { color:#fff; text-decoration:none; font-weight:bold; }
-    main { margin-top:70px; padding:20px; }
-    #report { margin-top:20px; padding:20px; background:white; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.2); text-align:left; }
-    .meme { margin-top:15px; max-width:200px; }
-    button { margin:5px; padding:8px 15px; border:none; border-radius:8px; cursor:pointer; }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
 </head>
 <body>
-  <header>
+  <header class="topbar">
     <a href="https://app.orca.so" target="_blank">🐬 Comprar na Orca</a>
     <a href="https://jup.ag" target="_blank">🚀 Comprar na Jupiter</a>
     <a href="https://solscan.io/account/2NERt9zLBG2tKbcPXwfBYsRrPhFMVAxpR6ajfeEWeJSB" target="_blank">❤️ Doar</a>
@@ -25,101 +17,9 @@
     <h1>🔍 Turbo Tuga Scam Analyzer</h1>
     <input id="tokenInput" type="text" placeholder="Cole o mint address do token" />
     <button onclick="generateReport()">Gerar Relatório</button>
-    <button onclick="switchRpc()">🔄 Trocar RPC</button>
     <div id="report"></div>
   </main>
 
-  <script>
-    // Lista de RPCs públicos testados com CORS liberado
-    const RPC_ENDPOINTS = [
-      "https://rpc.ankr.com/solana",
-      "https://rpc.solana.fyi"
-    ];
-
-    let currentRpc = 0;
-    let connection = new solanaWeb3.Connection(RPC_ENDPOINTS[currentRpc]);
-
-    function switchRpc(){
-      currentRpc = (currentRpc + 1) % RPC_ENDPOINTS.length;
-      connection = new solanaWeb3.Connection(RPC_ENDPOINTS[currentRpc]);
-      alert(`🔄 RPC trocado para: ${RPC_ENDPOINTS[currentRpc]}`);
-    }
-
-    async function safeRequest(fn){
-      try {
-        return await fn();
-      } catch(err){
-        console.warn("Erro RPC:", err.message);
-        if (err.message.includes("403")) {
-          alert("❌ O RPC bloqueou o acesso direto do navegador. Configure um proxy ou use outro RPC.");
-        }
-        switchRpc();
-        throw err;
-      }
-    }
-
-    const memes = [
-      "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
-      "https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif",
-      "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
-      "https://media.giphy.com/media/l2JHRhAtnJSDNJ2py/giphy.gif",
-      "https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif"
-    ];
-
-    async function generateReport(){
-      const mintInput = document.getElementById("tokenInput").value.trim();
-      if(!mintInput) return alert("⚠️ Informe um token mint válido");
-
-      const mintPub = new solanaWeb3.PublicKey(mintInput);
-
-      let report = { name:"Unknown", symbol:"Unknown", supply:"N/A", decimals:"N/A", holders:"N/A" };
-
-      try {
-        const supplyInfo = await safeRequest(() => connection.getTokenSupply(mintPub));
-        report.supply = supplyInfo.value.uiAmountString;
-        report.decimals = supplyInfo.value.decimals;
-
-        const largestAccounts = await safeRequest(() => connection.getTokenLargestAccounts(mintPub));
-        report.holders = largestAccounts.value.length;
-
-        let score = 30;
-        if(report.holders > 1000) score +=20;
-        if(report.supply && parseFloat(report.supply) > 0) score +=20;
-
-        const meme = memes[Math.floor(Math.random()*memes.length)];
-
-        document.getElementById("report").innerHTML = `
-          <h2>📊 Token Report</h2>
-          <p><b>Mint:</b> ${mintInput}</p>
-          <p><b>Supply / Decimals:</b> ${report.supply} / ${report.decimals}</p>
-          <p><b>Holders:</b> ${report.holders}</p>
-          <p><b>Score:</b> ${score}/100</p>
-          <p><b>Status:</b> ${score >= 70 ? "✅ Confiável" : score >= 50 ? "⚠️ Risco Médio" : "❌ Possível SCAM"}</p>
-          <img src="${meme}" class="meme"/>
-          <div style="margin-top:20px;">
-            <button onclick="window.open('https://app.orca.so', '_blank')">🐬 Buy on Orca</button>
-            <button onclick="window.open('https://jup.ag', '_blank')">🚀 Buy on Jupiter</button>
-            <button onclick="exportPDF()">📄 PDF</button>
-            <button onclick="shareTwitter()">🐦 Share Twitter</button>
-            <button onclick="shareTelegram()">📢 Share Telegram</button>
-          </div>
-        `;
-
-      } catch(err){
-        console.error(err);
-        document.getElementById("report").innerHTML = `❌ Erro ao gerar relatório: ${err.message}`;
-      }
-    }
-
-    function exportPDF(){ alert("📄 Função PDF em desenvolvimento"); }
-    function shareTwitter(){
-      const text = document.getElementById("report").innerText;
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
-    }
-    function shareTelegram(){
-      const text = document.getElementById("report").innerText;
-      window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(text)}`, "_blank");
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
