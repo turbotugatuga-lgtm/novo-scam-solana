@@ -23,7 +23,7 @@ async function generateReport() {
   };
 
   try {
-    // --- Shyft (on-chain data) ---
+    // --- Shyft ---
     const shyftRes = await fetch(
       `https://api.shyft.to/sol/v1/token/get_info?network=mainnet-beta&token_address=${mint}`,
       { headers: { "x-api-key": shyftKey } }
@@ -40,7 +40,7 @@ async function generateReport() {
       report.holders = d.holder || "N/A";
     }
 
-    // --- Birdeye (market data, optional) ---
+    // --- Birdeye (opcional) ---
     if (birdeyeKey) {
       const beRes = await fetch(
         `https://public-api.birdeye.so/defi/token_overview?address=${mint}`,
@@ -66,7 +66,7 @@ async function generateReport() {
       console.warn("Jupiter price fetch failed", e);
     }
 
-    // --- Risk Score simples ---
+    // --- Risk Score ---
     let score = 65;
     if (report.mintAuthority !== "Revoked") score -= 20;
     if (report.freezeAuthority !== "None") score -= 10;
@@ -85,21 +85,23 @@ async function generateReport() {
 
     // --- Render ---
     document.getElementById("report").innerHTML = `
-      <h2>Token Report</h2>
-      <p><b>${report.name} (${report.symbol})</b></p>
-      <p><b>Mint:</b> ${mint}</p>
-      <p><b>Score:</b> ${score}/100</p>
-      <p><b>Price:</b> ${report.price}</p>
-      <p><b>24h Volume:</b> ${report.volume24h}</p>
-      <p><b>Liquidity:</b> ${report.liquidity}</p>
-      <p><b>Market Cap:</b> ${report.marketCap}</p>
-      <p><b>Supply / Decimals:</b> ${report.supply} / ${report.decimals}</p>
-      <p><b>Holders:</b> ${report.holders}</p>
-      <p><b>Mint authority:</b> ${report.mintAuthority}</p>
-      <p><b>Freeze authority:</b> ${report.freezeAuthority}</p>
-      <p>${riskMsg}</p>
-      <div style="text-align:center; margin:15px 0;">
-        <img src="${riskGif}" alt="Risk meme" style="max-width:250px; border-radius:12px;">
+      <div id="reportContent">
+        <h2>Token Report</h2>
+        <p><b>${report.name} (${report.symbol})</b></p>
+        <p><b>Mint:</b> ${mint}</p>
+        <p><b>Score:</b> ${score}/100</p>
+        <p><b>Price:</b> ${report.price}</p>
+        <p><b>24h Volume:</b> ${report.volume24h}</p>
+        <p><b>Liquidity:</b> ${report.liquidity}</p>
+        <p><b>Market Cap:</b> ${report.marketCap}</p>
+        <p><b>Supply / Decimals:</b> ${report.supply} / ${report.decimals}</p>
+        <p><b>Holders:</b> ${report.holders}</p>
+        <p><b>Mint authority:</b> ${report.mintAuthority}</p>
+        <p><b>Freeze authority:</b> ${report.freezeAuthority}</p>
+        <p>${riskMsg}</p>
+        <div style="text-align:center; margin:15px 0;">
+          <img src="${riskGif}" alt="Risk meme" style="max-width:250px; border-radius:12px;">
+        </div>
       </div>
       <hr>
       <button onclick="exportPDF()">📄 Export PDF</button>
@@ -111,15 +113,25 @@ async function generateReport() {
   }
 }
 
+// --- PDF export ---
 function exportPDF() {
-  alert("📄 PDF export coming soon!");
+  const element = document.getElementById("reportContent");
+  const opt = {
+    margin: 0.5,
+    filename: "TurboTuga-Token-Report.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
+  };
+  html2pdf().set(opt).from(element).save();
 }
 
+// --- Share API ---
 function shareReport() {
   if (navigator.share) {
     navigator.share({
       title: "Turbo Tuga Token Report",
-      text: document.getElementById("report").innerText,
+      text: document.getElementById("reportContent").innerText,
       url: window.location.href
     });
   } else {
