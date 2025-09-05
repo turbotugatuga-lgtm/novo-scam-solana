@@ -2,29 +2,29 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Turbo Tuga Ultra Meme Analyzer</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
+<div class="container">
   <h1>🚀 Turbo Tuga Ultra Meme Analyzer</h1>
-  <div class="fixed-memes">
-    <img src="https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif" alt="Rocket to Moon">
-    <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="Chart Explosion">
+
+  <div class="token-input">
+    <input type="text" id="tokenMint" placeholder="Enter Solana token mint (e.g., 9QLR3W...)">
+    <button onclick="generateReport()">🎯 Generate Report</button>
   </div>
-</header>
 
-<main>
-  <input id="tokenInput" type="text" placeholder="Enter token mint address">
-  <button onclick="generateReport()">Generate Report</button>
-
-  <div id="report"></div>
-
-  <div class="purchase-buttons">
-    <button onclick="window.open('https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112', '_blank')">🐬 Buy Turbo Tuga on Orca</button>
-    <button onclick="window.open('https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112', '_blank')">🚀 Buy Turbo Tuga on Jupiter</button>
+  <div id="report" class="report">
+    <!-- Report will be generated here -->
+    <p>Enter a token and press Generate!</p>
   </div>
-</main>
+
+  <div class="buy-buttons">
+    <a href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">🐬 Buy Turbo Tuga on Orca</a>
+    <a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">🚀 Buy Turbo Tuga on Jupiter</a>
+  </div>
+</div>
 
 <script src="script.js"></script>
 </body>
