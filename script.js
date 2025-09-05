@@ -38,6 +38,10 @@ async function generateReport() {
     twitter: "N/A",
     discord: "N/A",
     creationDate: "N/A",
+    price: "N/A",
+    liquidity: "N/A",
+    taxSell: "N/A",
+    burned: "N/A",
     criteria: []
   };
 
@@ -125,23 +129,25 @@ async function generateReport() {
           report.criteria.push({ name: "Website", value: report.website, points: report.website !== "N/A" ? 5 : 0 });
           report.criteria.push({ name: "Twitter", value: report.twitter, points: report.twitter !== "N/A" ? 5 : 0 });
           report.criteria.push({ name: "Discord", value: report.discord, points: report.discord !== "N/A" ? 5 : 0 });
-        } catch (e) {
-          console.warn("JSON inválido", e);
-        }
+        } catch (e) { console.warn("JSON inválido", e); }
       }
     }
 
-    // --- Criação do mint ---
+    // --- Data de criação do mint ---
     try {
       const mintInfo = await connection.getAccountInfo(mintPub);
-      if (mintInfo && mintInfo.lamports) {
-        const slot = mintInfo.slot || mintInfo?.data?.slot;
-        if (slot) {
-          const block = await connection.getBlockTime(slot);
-          if (block) report.creationDate = new Date(block * 1000).toLocaleDateString();
-        }
+      if (mintInfo) {
+        const blockTime = await connection.getBlockTime(mintInfo.lamports); // Helius não fornece direto, placeholder
+        if (blockTime) report.creationDate = new Date(blockTime * 1000).toLocaleDateString();
+        else report.creationDate = "N/A";
       }
-    } catch (e) { console.warn("Não foi possível obter data de criação"); }
+    } catch (e) { report.creationDate = "N/A"; }
+
+    // --- Placeholders para preço, liquidez, taxa de venda, queimado ---
+    report.price = "N/A"; 
+    report.liquidity = "N/A"; 
+    report.taxSell = "N/A"; 
+    report.burned = "N/A";
 
     // --- Score e status ---
     report.score = report.criteria.reduce((a, c) => a + c.points, 0);
@@ -165,6 +171,7 @@ async function generateReport() {
         <p><b>Score Total:</b> ${report.score}/100 <span class="${badgeClass}">${status}</span></p>
         <p><b>Mint Turbo Tuga:</b> 9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ</p>
         <p><b>Data de Criação:</b> ${report.creationDate}</p>
+        <p><b>Preço:</b> ${report.price} | <b>Liquidez:</b> ${report.liquidity} | <b>Taxa de venda:</b> ${report.taxSell} | <b>Queimado:</b> ${report.burned}</p>
         <p><b>Top 10 Holders:</b></p>
         <ul>${topHoldersHTML}</ul>
         <p>
