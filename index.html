@@ -1,37 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Turbo Tuga Scam Analyzer — Versão Final</title>
-
-  <link rel="stylesheet" href="styles.css" />
-  <!-- Solana web3 -->
-  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
-  <!-- html2pdf for PDF export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Turbo Tuga Scam Detector</title>
 </head>
 <body>
-  <header class="topbar">
-    <a id="buy-orca" href="#" target="_blank">Comprar Turbo Tuga em DEX Orca</a>
-    <a id="buy-jup" href="#" target="_blank">Comprar Token Turbo Tuga dex Jupiter</a>
-  </header>
-
-  <main>
-    <h1>🔍 Turbo Tuga Scam Analyzer — Versão Final</h1>
-
-    <div class="controls">
-      <input id="tokenInput" type="text" placeholder="Cole o mint address do token (ex: 9QLR3...)" />
-      <button id="btnGenerate">Gerar Relatório</button>
-      <button id="btnRpcSwitch" title="Trocar RPC (fallback)">🔄 Trocar RPC</button>
-    </div>
-
-    <div id="report" class="card">
-      <p class="hint">Cole um mint SPL e clique em <b>Gerar Relatório</b>.</p>
-    </div>
-
-    <p class="disclaimer">⚠️ Este material é educativo e não é indicação de compra ou venda — apenas um meme educativo.</p>
-  </main>
+  <h1>🐢 Turbo Tuga Scam Detector</h1>
+  
+  <input type="text" id="tokenInput" placeholder="Cole o endereço do token aqui" style="width:400px;"/>
+  <button onclick="generateReport()">Gerar Relatório</button>
+  
+  <div id="report" style="margin-top:20px; border:1px solid #ccc; padding:10px;">
+    <!-- Relatório aparece aqui -->
+  </div>
 
   <script src="script.js"></script>
 </body>
