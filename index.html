@@ -7,23 +7,23 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>😂 Bem-vindo ao Turbo Tuga Ultra Meme Analyzer 🚀</h1>
-  <p>O único lugar onde seu token pode virar piada ou foguete pra lua 🌕</p>
+  <h1>😂 Turbo Tuga Ultra Meme Analyzer 🚀</h1>
+  <p>O único analisador onde o token pode virar foguete, explodir ou cair no abismo 💥</p>
 
-  <div class="meme-header">
-    <img src="https://i.imgflip.com/30zz5g.jpg" alt="meme1">
-    <img src="https://i.imgflip.com/65r2kq.jpg" alt="meme2">
-    <img src="https://i.imgflip.com/76j1a7.jpg" alt="meme3">
-  </div>
-
-  <p><strong>Token Turbo Tuga Mint:</strong>  
-    <span class="mint">9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ</span>
-  </p>
-  
+  <!-- Campo para inserir o token -->
+  <input type="text" id="tokenInput" placeholder="Cole aqui o Mint Address do token">
   <button onclick="generateReport()">🔥 Gerar Relatório Meme 🔥</button>
 
   <div id="report"></div>
 
+  <!-- Botões extras -->
+  <div id="actions" style="display:none; margin-top:20px;">
+    <button onclick="shareTwitter()">🐦 Compartilhar no Twitter</button>
+    <button onclick="shareTelegram()">📢 Compartilhar no Telegram</button>
+    <button onclick="downloadPDF()">📄 Exportar PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
