@@ -1,74 +1,67 @@
 body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background: linear-gradient(135deg,#ffe259,#ffa751);
+  font-family: 'Comic Sans MS', cursive, sans-serif;
   margin: 0;
   padding: 0;
+  text-align: center;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  color: #222;
 }
 
 .topbar {
   background: #111;
-  padding: 12px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.topbar a {
   color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-  border: 1px solid #fff;
-  padding: 6px 12px;
-  border-radius: 8px;
-  transition: 0.3s;
-}
-
-.topbar a:hover {
-  background: #fff;
-  color: #111;
+  padding: 15px;
+  text-align: center;
 }
 
 main {
-  margin-top: 80px;
   padding: 20px;
 }
 
 input {
   padding: 10px;
   width: 300px;
-  font-size: 16px;
-  border-radius: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
   border: none;
-  margin-right: 10px;
+  font-size: 16px;
 }
 
 button {
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 10px;
+  padding: 10px 15px;
+  margin: 5px;
   border: none;
-  background: #ff4d4d;
-  color: white;
+  border-radius: 5px;
   cursor: pointer;
+  font-weight: bold;
+  background: #ff9a9e;
+  color: #fff;
+  transition: transform 0.2s;
 }
 
 button:hover {
-  background: #ff1a1a;
+  transform: scale(1.1);
 }
 
-.report {
+#reportContainer {
   margin-top: 20px;
+  background: rgba(255, 255, 255, 0.85);
   padding: 20px;
-  background: white;
   border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
-.report img {
+#topMeme img, #bottomMeme img {
   max-width: 150px;
   margin: 10px;
+}
+
+.actions a {
+  display: inline-block;
+  margin: 5px;
+  padding: 10px 15px;
+  background: #4caf50;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
 }
