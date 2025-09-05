@@ -1,31 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Turbo Tuga Ultra Meme Analyzer</title>
-<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Turbo Tuga Ultra Meme Analyzer</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="container">
-  <h1>🚀 Turbo Tuga Ultra Meme Analyzer</h1>
+  <header class="topbar">
+    <a href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">
+      🐬 Buy Turbo Tuga on Orca
+    </a>
+    <a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">
+      🚀 Buy Turbo Tuga on Jupiter
+    </a>
+  </header>
 
-  <div class="token-input">
-    <input type="text" id="tokenMint" placeholder="Enter Solana token mint (e.g., 9QLR3W...)">
-    <button onclick="generateReport()">🎯 Generate Report</button>
-  </div>
+  <main>
+    <h1>🚀 Turbo Tuga Ultra Meme Analyzer</h1>
+    <input id="tokenInput" type="text" placeholder="Paste token mint address" />
+    <button onclick="generateReport()">Generate Report</button>
+    <div id="report" class="report">
+      <p>Enter a token mint and click "Generate Report"</p>
+    </div>
+  </main>
 
-  <div id="report" class="report">
-    <!-- Report will be generated here -->
-    <p>Enter a token and press Generate!</p>
-  </div>
-
-  <div class="buy-buttons">
-    <a href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">🐬 Buy Turbo Tuga on Orca</a>
-    <a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">🚀 Buy Turbo Tuga on Jupiter</a>
-  </div>
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
