@@ -2,7 +2,6 @@ const RPC_ENDPOINT = "https://mainnet.helius-rpc.com/?api-key=66d627c2-34b8-4c3e
 const connection = new solanaWeb3.Connection(RPC_ENDPOINT);
 
 const memes = [
-  // 50+ memes/GIFs
   "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
   "https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif",
   "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
@@ -18,31 +17,7 @@ const memes = [
   "https://media.giphy.com/media/xT9IgIc0lryrxvqVGM/giphy.gif",
   "https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif",
   "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
-  "https://media.giphy.com/media/3o7abldj0b3rxrZUxW/giphy.gif",
-  "https://media.giphy.com/media/3oKIPCSX4UHmuS41TG/giphy.gif",
-  "https://media.giphy.com/media/xT1Ra4uO6t8U6uR8Le/giphy.gif",
-  "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
-  "https://media.giphy.com/media/l1J3preURPiwjRPvG/giphy.gif",
-  "https://media.giphy.com/media/3o6fJ1BM7r60LymVji/giphy.gif",
-  "https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif",
-  "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif",
-  "https://media.giphy.com/media/13CoXDiaCcCoyk/giphy.gif",
-  "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
-  "https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif",
-  "https://media.giphy.com/media/l2JHRhAtnJSDNJ2py/giphy.gif",
-  "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
-  "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
-  "https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif",
-  "https://media.giphy.com/media/3oKIPCSX4UHmuS41TG/giphy.gif",
-  "https://media.giphy.com/media/xT1Ra4uO6t8U6uR8Le/giphy.gif",
-  "https://media.giphy.com/media/3o6fJ1BM7r60LymVji/giphy.gif",
-  "https://media.giphy.com/media/3o7abldj0b3rxrZUxW/giphy.gif",
-  "https://media.giphy.com/media/l1J3preURPiwjRPvG/giphy.gif",
-  "https://media.giphy.com/media/3oz8xIsloV7zOmt81G/giphy.gif",
-  "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
-  "https://media.giphy.com/media/UqZ9m6R7gqC8w/giphy.gif",
-  "https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif",
-  "https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif"
+  "https://media.giphy.com/media/3o7abldj0b3rxrZUxW/giphy.gif"
 ];
 
 async function generateReport() {
@@ -59,8 +34,6 @@ async function generateReport() {
     topHolders: [],
     mintAuthority: "N/A",
     freezeAuthority: "N/A",
-    price: "N/A",
-    liquidity: "N/A",
     criteria: []
   };
 
@@ -79,13 +52,26 @@ async function generateReport() {
       report.criteria.push({ name: "Freeze Authority", value: report.freezeAuthority, points: report.freezeAuthority === "null" ? 5 : 0 });
     }
 
-    // --- Holders ---
-    const largestAccounts = await connection.getTokenLargestAccounts(mintPub);
-    report.holders = largestAccounts.value.length;
-    report.topHolders = largestAccounts.value.slice(0, 10).map(a => ({ address: a.address, amount: a.amount }));
-    report.criteria.push({ name: "Holders", value: report.holders, points: report.holders > 1000 ? 20 : 10 });
+    // --- Holders (top 10 apenas) ---
+    try {
+      const largestAccounts = await connection.getTokenLargestAccounts(mintPub);
+      report.topHolders = largestAccounts.value
+        .slice(0, 10)
+        .map(a => ({ address: a.address, amount: a.uiAmountString || a.amount }));
+      report.holders = largestAccounts.value.length;
 
-    // --- Metadata ---
+      report.criteria.push({
+        name: "Holders",
+        value: report.holders,
+        points: report.holders > 1000 ? 20 : 10
+      });
+    } catch (err) {
+      console.warn("Não foi possível obter holders:", err.message);
+      report.holders = "N/A";
+      report.topHolders = [];
+    }
+
+    // --- Metadata simplificado ---
     const TOKEN_METADATA_PROGRAM_ID = new solanaWeb3.PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
     const [metadataPDA] = await solanaWeb3.PublicKey.findProgramAddress(
       [new TextEncoder().encode("metadata"), TOKEN_METADATA_PROGRAM_ID.toBytes(), mintPub.toBytes()],
@@ -102,16 +88,8 @@ async function generateReport() {
           const json = await resp.json().catch(() => ({}));
           report.name = json.name || "Unknown";
           report.symbol = json.symbol || "Unknown";
-          report.image = json.image || "";
-          report.website = json.extensions?.website || "N/A";
-          report.twitter = json.extensions?.twitter || "N/A";
-          report.discord = json.extensions?.discord || "N/A";
-
           report.criteria.push({ name: "Metadata Name", value: report.name, points: report.name !== "Unknown" ? 10 : 0 });
           report.criteria.push({ name: "Metadata Symbol", value: report.symbol, points: report.symbol !== "Unknown" ? 10 : 0 });
-          report.criteria.push({ name: "Website", value: report.website, points: report.website !== "N/A" ? 5 : 0 });
-          report.criteria.push({ name: "Twitter", value: report.twitter, points: report.twitter !== "N/A" ? 5 : 0 });
-          report.criteria.push({ name: "Discord", value: report.discord, points: report.discord !== "N/A" ? 5 : 0 });
         } catch (e) {
           console.warn("JSON inválido", e);
         }
@@ -127,13 +105,11 @@ async function generateReport() {
 
     const meme = memes[Math.floor(Math.random() * memes.length)];
     const tableRows = report.criteria.map(c => `<tr><td>${c.name}</td><td>${c.value}</td><td class="score-badge">${c.points}</td></tr>`).join("");
-
     const topHoldersHTML = report.topHolders.map(h => `<li>${h.address}: ${h.amount}</li>`).join("");
 
     document.getElementById("report").innerHTML = `
       <div id="reportContent">
         <h2>📊 Turbo Tuga Token Report</h2>
-        ${report.image ? `<img src="${report.image}" alt="Logo" style="max-width:120px; border-radius:8px; display:block; margin:auto;"/>` : ""}
         <img src="${meme}" class="meme"/>
         <table class="table-score">
           <tr><th>Critério</th><th>Valor</th><th>Pontos</th></tr>
@@ -147,6 +123,7 @@ async function generateReport() {
           <a href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">Comprar Turbo Tuga em DEX Orca</a> | 
           <a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">Comprar Token Turbo Tuga dex Jupiter</a>
         </p>
+        <p><i>⚠️ Este material é educativo e não é indicação de compra ou venda.</i></p>
       </div>
       <div style="margin-top:20px;">
         <button onclick="exportPDF()">📄 Exportar PDF</button>
@@ -154,6 +131,7 @@ async function generateReport() {
         <button onclick="shareTelegram()">📢 Compartilhar Telegram</button>
       </div>
     `;
+
   } catch (err) {
     console.error(err);
     document.getElementById("report").innerHTML = `❌ Erro ao gerar relatório: ${err.message}`;
