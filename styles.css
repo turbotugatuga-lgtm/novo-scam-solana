@@ -1,22 +1,49 @@
 body {
-  font-family: 'Comic Neue', sans-serif;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  font-family: Arial, sans-serif;
   text-align: center;
-  color: #333;
+  background: linear-gradient(135deg,#ffe259,#ffa751);
+  margin: 0;
+  padding: 0;
 }
 
-.container {
-  max-width: 900px;
-  margin: 0 auto;
+.topbar {
+  background: #111;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.topbar a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  border: 1px solid #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.topbar a:hover {
+  background: #fff;
+  color: #111;
+}
+
+main {
+  margin-top: 80px;
   padding: 20px;
 }
 
 input {
   padding: 10px;
-  width: 60%;
+  width: 300px;
   font-size: 16px;
   border-radius: 10px;
-  border: 2px solid #ff6f91;
+  border: none;
+  margin-right: 10px;
 }
 
 button {
@@ -24,33 +51,24 @@ button {
   font-size: 16px;
   border-radius: 10px;
   border: none;
-  background: #ff6f91;
-  color: #fff;
+  background: #ff4d4d;
+  color: white;
   cursor: pointer;
 }
 
 button:hover {
-  box-shadow: 0px 0px 10px #ff6f91;
+  background: #ff1a1a;
 }
 
 .report {
   margin-top: 20px;
-  background: #fff;
-  border-radius: 15px;
   padding: 20px;
-  box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.buy-buttons a {
-  display: inline-block;
+.report img {
+  max-width: 150px;
   margin: 10px;
-  padding: 10px 20px;
-  border-radius: 10px;
-  background: #6a0dad;
-  color: #fff;
-  text-decoration: none;
-}
-
-.buy-buttons a:hover {
-  background: #9b30ff;
 }
