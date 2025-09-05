@@ -37,14 +37,14 @@ async function generateReport() {
     website: "N/A",
     twitter: "N/A",
     discord: "N/A",
+    creationDate: "N/A",
     criteria: []
   };
 
   try {
-    // --- Detecta token oficial ---
+    // --- Token oficial ---
     if (OFFICIAL_TOKENS.includes(mintInput)) {
-      report.name = "Token Oficial Solana";
-      report.symbol = mintInput === "So11111111111111111111111111111111111111112" ? "SOL" :
+      report.name = mintInput === "So11111111111111111111111111111111111111112" ? "SOL" :
                      mintInput.includes("mSo") ? "wSOL" : "USDC";
       report.score = 100;
       let badgeClass = "badge-safe";
@@ -71,7 +71,7 @@ async function generateReport() {
       return;
     }
 
-    // --- Token SPL normal ---
+    // --- Token SPL ---
     const mintAccount = await connection.getParsedAccountInfo(mintPub);
     if (mintAccount.value && mintAccount.value.data.parsed) {
       const info = mintAccount.value.data.parsed.info;
@@ -79,7 +79,6 @@ async function generateReport() {
       report.decimals = info.decimals;
       report.mintAuthority = info.mintAuthority || "null";
       report.freezeAuthority = info.freezeAuthority || "null";
-
       report.criteria.push({ name: "Supply", value: report.supply, points: 10 });
       report.criteria.push({ name: "Mint Authority", value: report.mintAuthority, points: report.mintAuthority === "null" ? 10 : 0 });
       report.criteria.push({ name: "Freeze Authority", value: report.freezeAuthority, points: report.freezeAuthority === "null" ? 5 : 0 });
@@ -121,7 +120,6 @@ async function generateReport() {
           report.website = json.extensions?.website || "N/A";
           report.twitter = json.extensions?.twitter || "N/A";
           report.discord = json.extensions?.discord || "N/A";
-
           report.criteria.push({ name: "Metadata Name", value: report.name, points: report.name !== "Unknown" ? 10 : 0 });
           report.criteria.push({ name: "Metadata Symbol", value: report.symbol, points: report.symbol !== "Unknown" ? 10 : 0 });
           report.criteria.push({ name: "Website", value: report.website, points: report.website !== "N/A" ? 5 : 0 });
@@ -133,7 +131,19 @@ async function generateReport() {
       }
     }
 
-    // --- Score e Status ---
+    // --- Criação do mint ---
+    try {
+      const mintInfo = await connection.getAccountInfo(mintPub);
+      if (mintInfo && mintInfo.lamports) {
+        const slot = mintInfo.slot || mintInfo?.data?.slot;
+        if (slot) {
+          const block = await connection.getBlockTime(slot);
+          if (block) report.creationDate = new Date(block * 1000).toLocaleDateString();
+        }
+      }
+    } catch (e) { console.warn("Não foi possível obter data de criação"); }
+
+    // --- Score e status ---
     report.score = report.criteria.reduce((a, c) => a + c.points, 0);
     let status = "", badgeClass = "";
     if (report.score >= 70) { status = "✅ Confiável"; badgeClass = "badge-safe"; }
@@ -154,6 +164,7 @@ async function generateReport() {
         </table>
         <p><b>Score Total:</b> ${report.score}/100 <span class="${badgeClass}">${status}</span></p>
         <p><b>Mint Turbo Tuga:</b> 9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ</p>
+        <p><b>Data de Criação:</b> ${report.creationDate}</p>
         <p><b>Top 10 Holders:</b></p>
         <ul>${topHoldersHTML}</ul>
         <p>
