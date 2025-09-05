@@ -1,5 +1,13 @@
 // script.js
 
+// -----------------------------
+// Configurações
+// -----------------------------
+const HELIUS_KEY = "66d627c2-34b8-4c3e-9123-14f16e196ab8";
+const SHYFT_KEY = "VzPp9y_hw4dFfmfF";
+const SOLSCAN_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE3NTcwMzQwMjcyODIsImVtYWlsIjoidHVyYm90dWdhdHVnYUBnbWFpbC5jb20iLCJhY3Rpb24iOiJ0b2tlbi1hcGkiLCJhcGlWZXJzaW9uIjoidjIiLCJpYXQiOjE3NTcwMzQwMjd9.244yHHTSQhMb-afA0r9HlWhvhTuMAcdqj91bru0BvHM";
+
+// Tokens oficiais
 const OFFICIAL_TOKENS = {
   "So11111111111111111111111111111111111111112": {
     name: "Solana",
@@ -23,11 +31,13 @@ const OFFICIAL_TOKENS = {
   }
 };
 
-// Função utilitária para pegar dados da CoinGecko
+// -----------------------------
+// Funções utilitárias
+// -----------------------------
+
 async function fetchCoinGeckoData(id) {
   try {
     const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}`);
-    if (!res.ok) throw new Error("CoinGecko fetch failed");
     const data = await res.json();
     return {
       price: data.market_data.current_price.usd,
@@ -41,12 +51,63 @@ async function fetchCoinGeckoData(id) {
   }
 }
 
-// Função principal do relatório
+// Helius - dados básicos
+async function fetchHelius(mint) {
+  try {
+    const res = await fetch(`https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "token",
+        method: "getTokenSupply",
+        params: [mint]
+      })
+    });
+    const data = await res.json();
+    return data?.result?.value?.uiAmountString || "N/A";
+  } catch {
+    return "N/A";
+  }
+}
+
+// Shyft - pools/liquidez
+async function fetchShyft(mint) {
+  try {
+    const res = await fetch(
+      `https://api.shyft.to/solana/defi/pools?network=mainnet&token=${mint}`,
+      { headers: { "x-api-key": SHYFT_KEY } }
+    );
+    if (!res.ok) return "N/A";
+    const data = await res.json();
+    return data?.result?.[0]?.liquidity || "N/A";
+  } catch {
+    return "N/A";
+  }
+}
+
+// Solscan - preço
+async function fetchSolscanPrice(mint) {
+  try {
+    const res = await fetch(`https://pro-api.solscan.io/v2.0/token/price?address=${mint}`, {
+      headers: { Authorization: `Bearer ${SOLSCAN_KEY}` }
+    });
+    if (!res.ok) return "N/A";
+    const data = await res.json();
+    return data?.data?.value || "N/A";
+  } catch {
+    return "N/A";
+  }
+}
+
+// -----------------------------
+// Relatório
+// -----------------------------
 async function generateReport(mint) {
   const reportDiv = document.getElementById("report");
   reportDiv.innerHTML = "⏳ Gerando relatório...";
 
-  // Se for token oficial → bypass SCAM checker
+  // ✅ Token oficial → bypass SCAM
   if (OFFICIAL_TOKENS[mint]) {
     const info = OFFICIAL_TOKENS[mint];
     const gecko = await fetchCoinGeckoData(info.coingeckoId);
@@ -63,20 +124,23 @@ async function generateReport(mint) {
       <p>✅ Token oficial da Solana Network, não classificado como SCAM.</p>
       <p>Mint: ${mint}</p>
     `;
-    return;
+    return; // encerra aqui
   }
 
-  // Caso contrário → continua o relatório normal (simplificado exemplo)
+  // 🟠 SPL Token comum
+  const supply = await fetchHelius(mint);
+  const liquidity = await fetchShyft(mint);
+  const price = await fetchSolscanPrice(mint);
+
   let score = 0;
   let rows = "";
 
-  // Exemplo de checagem fake só pra estruturar
   const checks = [
-    { criterio: "Supply", valor: "1000000000", pontos: 10 },
+    { criterio: "Supply", valor: supply, pontos: 10 },
+    { criterio: "Liquidez", valor: liquidity, pontos: liquidity !== "N/A" ? 10 : 0 },
+    { criterio: "Preço", valor: price, pontos: price !== "N/A" ? 10 : 0 },
     { criterio: "Mint Authority", valor: "null", pontos: 10 },
-    { criterio: "Freeze Authority", valor: "null", pontos: 5 },
-    { criterio: "Holders", valor: "1234", pontos: 10 },
-    { criterio: "Preço", valor: "N/A", pontos: 0 }
+    { criterio: "Freeze Authority", valor: "null", pontos: 5 }
   ];
 
   checks.forEach(c => {
@@ -100,7 +164,9 @@ async function generateReport(mint) {
   `;
 }
 
-// Exemplo de binding
+// -----------------------------
+// Bind do botão
+// -----------------------------
 document.getElementById("generateBtn").addEventListener("click", () => {
   const mint = document.getElementById("tokenMint").value.trim();
   if (!mint) {
@@ -109,3 +175,4 @@ document.getElementById("generateBtn").addEventListener("click", () => {
   }
   generateReport(mint);
 });
+
