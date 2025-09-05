@@ -7,20 +7,28 @@
 </head>
 <body>
   <header class="topbar">
-    <a href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">
-      🐬 Buy Turbo Tuga on Orca
-    </a>
-    <a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">
-      🚀 Buy Turbo Tuga on Jupiter
-    </a>
+    <h1>🚀 Turbo Tuga Ultra Meme Analyzer</h1>
+    <p>This report is pure fun & meme. It does NOT reflect real token data!</p>
   </header>
 
   <main>
-    <h1>🚀 Turbo Tuga Ultra Meme Analyzer</h1>
-    <input id="tokenInput" type="text" placeholder="Paste token mint address" />
-    <button onclick="generateReport()">Generate Report</button>
-    <div id="report" class="report">
-      <p>Enter a token mint and click "Generate Report"</p>
+    <input id="tokenInput" type="text" placeholder="Paste token mint here" />
+    <button onclick="generateReport()">Generate Meme Report</button>
+
+    <div id="reportContainer">
+      <div id="topMeme"></div>
+      <div id="report"></div>
+      <div id="bottomMeme"></div>
+    </div>
+
+    <div class="actions">
+      <button onclick="exportPDF()">📄 Export PDF</button>
+      <button onclick="shareTwitter()">🐦 Share Twitter</button>
+      <button onclick="shareTelegram()">📢 Share Telegram</button>
+      <br><br>
+      <a href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">🐬 Buy Turbo Tuga on Orca</a>
+      <br>
+      <a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">🚀 Buy Turbo Tuga on Jupiter</a>
     </div>
   </main>
 
