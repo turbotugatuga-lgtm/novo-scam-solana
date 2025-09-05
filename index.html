@@ -1,17 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Turbo Tuga Scam Detector</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Turbo Tuga - Scanner Turbo</title>
+
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <style>
+    /* estilo mínimo embutido para facilitar teste */
+    body{font-family:Arial, sans-serif;background:linear-gradient(120deg,#ffe259,#ffa751);margin:0;padding:40px;text-align:center}
+    .card{max-width:980px;margin:0 auto;background:#fff;padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.12);text-align:left}
+    input{padding:10px;width:68%;border-radius:8px;border:1px solid #ddd;font-size:16px}
+    button{padding:10px 14px;margin-left:6px;border-radius:8px;border:none;background:#222;color:#fff;cursor:pointer}
+    .meme{display:block;margin:12px auto;max-width:220px;border-radius:10px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{border:1px solid #eee;padding:8px;text-align:center}
+    th{background:#ff3c3c;color:#fff}
+    .badge-safe{background:#28a745;color:#fff;padding:6px 10px;border-radius:8px}
+    .badge-medium{background:#ffd700;color:#111;padding:6px 10px;border-radius:8px}
+    .badge-scam{background:#ff4c4c;color:#fff;padding:6px 10px;border-radius:8px}
+    .small{font-size:13px;color:#666}
+  </style>
 </head>
 <body>
-  <h1>🐢 Turbo Tuga Scam Detector</h1>
-  
-  <input type="text" id="tokenInput" placeholder="Cole o endereço do token aqui" style="width:400px;"/>
-  <button onclick="generateReport()">Gerar Relatório</button>
-  
-  <div id="report" style="margin-top:20px; border:1px solid #ccc; padding:10px;">
-    <!-- Relatório aparece aqui -->
+  <div class="card">
+    <h1>🔍 Turbo Tuga Token Scanner (versão atualizada)</h1>
+
+    <div style="margin:12px 0;">
+      <input id="tokenInput" placeholder="Cole o mint address do token (ex: 9QLR3W... ou So1111...)" />
+      <button id="generateBtn">Gerar Relatório</button>
+      <button id="switchRpcBtn" title="Trocar RPC/fallback">🔁 RPC</button>
+    </div>
+
+    <div id="report">
+      <p class="small">Cole um mint SPL e clique em <b>Gerar Relatório</b>. Tokens oficiais (SOL, USDC, USDT, BONK, ...) serão tratados como oficiais.</p>
+    </div>
   </div>
 
   <script src="script.js"></script>
