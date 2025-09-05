@@ -1,120 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatório Turbo Tuga</title>
-  <style>
-    /* Estilos para o relatório */
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Turbo Tuga Scam Analyzer — Versão Final</title>
+
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Solana web3 -->
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+  <!-- html2pdf for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-  <div id="report">
-    <h1>Relatório Turbo Tuga</h1>
-    <p><strong>Mint Address:</strong> 9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ</p>
-    <p><strong>Data de Criação:</strong> <span id="creationDate">Carregando...</span></p>
-    <p><strong>Preço:</strong> <span id="price">Carregando...</span></p>
-    <p><strong>Liquidez:</strong> <span id="liquidity">Carregando...</span></p>
-    <p><strong>Taxa de Venda:</strong> <span id="taxSell">Carregando...</span></p>
-    <p><strong>Queimado:</strong> <span id="burned">Carregando...</span></p>
-    <h2>Top 10 Holders</h2>
-    <ul id="topHolders">
-      <!-- Lista de Holders -->
-    </ul>
-    <h2>Score de Confiabilidade</h2>
-    <p id="score">Carregando...</p>
-    <h2>Links de Compra</h2>
-    <ul>
-      <li><a href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">Comprar na Orca</a></li>
-      <li><a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">Comprar na Jupiter</a></li>
-    </ul>
-    <h2>Memes Aleatórios</h2>
-    <img id="meme" src="" alt="Meme Aleatório">
-    <h2>Compartilhar</h2>
-    <button onclick="exportPDF()">Exportar PDF</button>
-    <button onclick="shareTwitter()">Compartilhar no Twitter</button>
-    <button onclick="shareTelegram()">Compartilhar no Telegram</button>
-  </div>
+  <header class="topbar">
+    <a id="buy-orca" href="#" target="_blank">Comprar Turbo Tuga em DEX Orca</a>
+    <a id="buy-jup" href="#" target="_blank">Comprar Token Turbo Tuga dex Jupiter</a>
+  </header>
 
-  <script>
-    // Função para obter dados do token
-    async function getTokenData() {
-      const mintAddress = '9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ';
-      const heliusApiKey = '66d627c2-34b8-4c3e-9123-14f16e196ab8';
-      const shyftApiKey = 'VzPp9y_hw4dFfmfF';
-      const solscanApiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE3NTcwMzQwMjcyODIsImVtYWlsIjoidHVyYm90dWdhdHVnYUBnbWFpbC5jb20iLCJhY3Rpb24iOiJ0b2tlbi1hcGkiLCJhcGlWZXJzaW9uIjoidjIiLCJpYXQiOjE3NTcwMzQwMjd9.244yHHTSQhMb-afA0r9HlWhvhTuMAcdqj91bru0BvHM';
+  <main>
+    <h1>🔍 Turbo Tuga Scam Analyzer — Versão Final</h1>
 
-      try {
-        // Obter dados de criação
-        const creationDateResponse = await fetch(`https://api.helius.dev/v0/transactions?mint=${mintAddress}`, {
-          headers: { 'Authorization': `Bearer ${heliusApiKey}` }
-        });
-        const creationDateData = await creationDateResponse.json();
-        const creationDate = new Date(creationDateData[0]?.blockTime * 1000).toLocaleDateString();
-        document.getElementById('creationDate').textContent = creationDate;
+    <div class="controls">
+      <input id="tokenInput" type="text" placeholder="Cole o mint address do token (ex: 9QLR3...)" />
+      <button id="btnGenerate">Gerar Relatório</button>
+      <button id="btnRpcSwitch" title="Trocar RPC (fallback)">🔄 Trocar RPC</button>
+    </div>
 
-        // Obter preço e liquidez
-        const priceResponse = await fetch(`https://pro-api.solscan.io/v2.0/token/price?address=${mintAddress}`, {
-          headers: { 'Authorization': `Bearer ${solscanApiKey}` }
-        });
-        const priceData = await priceResponse.json();
-        const price = priceData?.data?.[0]?.price || 'N/A';
-        document.getElementById('price').textContent = price;
+    <div id="report" class="card">
+      <p class="hint">Cole um mint SPL e clique em <b>Gerar Relatório</b>.</p>
+    </div>
 
-        const liquidityResponse = await fetch(`https://api.shyft.to/solana/defi/pools?token=${mintAddress}`, {
-          headers: { 'Authorization': `Bearer ${shyftApiKey}` }
-        });
-        const liquidityData = await liquidityResponse.json();
-        const liquidity = liquidityData?.totalLiquidity || 'N/A';
-        document.getElementById('liquidity').textContent = liquidity;
+    <p class="disclaimer">⚠️ Este material é educativo e não é indicação de compra ou venda — apenas um meme educativo.</p>
+  </main>
 
-        // Obter taxa de venda e queimado
-        const taxSell = 'N/A'; // Placeholder
-        const burned = 'N/A'; // Placeholder
-        document.getElementById('taxSell').textContent = taxSell;
-        document.getElementById('burned').textContent = burned;
-
-        // Obter top 10 holders
-        const holdersResponse = await fetch(`https://api.helius.dev/v0/holders?mint=${mintAddress}`, {
-          headers: { 'Authorization': `Bearer ${heliusApiKey}` }
-        });
-        const holdersData = await holdersResponse.json();
-        const topHolders = holdersData.slice(0, 10).map(holder => `<li>${holder.address}: ${holder.amount}</li>`).join('');
-        document.getElementById('topHolders').innerHTML = topHolders;
-
-        // Calcular score de confiabilidade
-        const score = 35; // Placeholder
-        document.getElementById('score').textContent = `${score}/100`;
-
-        // Exibir meme aleatório
-        const memeUrls = [
-          'https://example.com/meme1.jpg',
-          'https://example.com/meme2.jpg',
-          'https://example.com/meme3.jpg'
-        ];
-        const randomMeme = memeUrls[Math.floor(Math.random() * memeUrls.length)];
-        document.getElementById('meme').src = randomMeme;
-
-      } catch (error) {
-        console.error('Erro ao obter dados do token:', error);
-      }
-    }
-
-    // Funções para exportar e compartilhar
-    function exportPDF() {
-      // Implementar exportação para PDF
-    }
-
-    function shareTwitter() {
-      // Implementar compartilhamento no Twitter
-    }
-
-    function shareTelegram() {
-      // Implementar compartilhamento no Telegram
-    }
-
-    // Carregar dados ao iniciar
-    window.onload = getTokenData;
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
