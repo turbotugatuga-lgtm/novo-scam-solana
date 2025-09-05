@@ -43,39 +43,35 @@ async function generateReport() {
     // --- Helius Token Info ---
     const heliusUrl = `https://api.helius.xyz/v1/tokens/${mintInput}?api-key=${Helius_API_KEY}`;
     const heliusResp = await fetch(heliusUrl);
-    if (!heliusResp.ok) throw new Error("Erro Helius: " + heliusResp.status);
-    const heliusData = await heliusResp.json();
+    const heliusData = heliusResp.ok ? await heliusResp.json() : [];
+    const token = Array.isArray(heliusData) && heliusData.length>0 ? heliusData[0] : {};
 
-    if (heliusData && heliusData.length > 0) {
-      const token = heliusData[0];
-      report.supply = token.supply || report.supply;
-      report.decimals = token.decimals || report.decimals;
-      report.mintAuthority = token.mintAuthority || report.mintAuthority;
-      report.freezeAuthority = token.freezeAuthority || report.freezeAuthority;
-      report.holders = token.holderCount || report.holders;
-      report.topHolders = token.topHolders || [];
-      report.creationDate = token.creationDate || report.creationDate;
-      report.price = token.price || report.price;
-      report.liquidity = token.liquidity || report.liquidity;
-      report.burned = token.burned || report.burned;
-      report.concentrationTop3 = token.top3Concentration || report.concentrationTop3;
+    // --- Preenchendo dados com fallbacks ---
+    report.supply = token.supply ?? report.supply;
+    report.decimals = token.decimals ?? report.decimals;
+    report.mintAuthority = token.mintAuthority ?? report.mintAuthority;
+    report.freezeAuthority = token.freezeAuthority ?? report.freezeAuthority;
+    report.holders = token.holderCount ?? report.holders;
+    report.topHolders = Array.isArray(token.topHolders) ? token.topHolders : [];
+    report.creationDate = token.creationDate ?? report.creationDate;
+    report.price = token.price ?? report.price;
+    report.liquidity = token.liquidity ?? report.liquidity;
+    report.burned = token.burned ?? report.burned;
+    report.concentrationTop3 = token.top3Concentration ?? report.concentrationTop3;
 
-      // --- Metaplex metadata ---
-      if(token.metadataUri){
-        try {
-          const metaResp = await fetch(token.metadataUri);
-          if(metaResp.ok){
-            const metaJSON = await metaResp.json();
-            report.name = metaJSON.name || report.name;
-            report.symbol = metaJSON.symbol || report.symbol;
-            report.website = metaJSON.website || report.website;
-            report.twitter = metaJSON.twitter || report.twitter;
-            report.discord = metaJSON.discord || report.discord;
-          }
-        } catch(e){
-          console.warn("Erro ao buscar Metaplex metadata:", e);
+    // --- Metaplex metadata ---
+    if(token.metadataUri){
+      try {
+        const metaResp = await fetch(token.metadataUri);
+        if(metaResp.ok){
+          const metaJSON = await metaResp.json();
+          report.name = metaJSON.name ?? report.name;
+          report.symbol = metaJSON.symbol ?? report.symbol;
+          report.website = metaJSON.website ?? report.website;
+          report.twitter = metaJSON.twitter ?? report.twitter;
+          report.discord = metaJSON.discord ?? report.discord;
         }
-      }
+      } catch(e){ console.warn("Erro ao buscar Metaplex metadata:", e); }
     }
 
     // --- Score ---
@@ -95,7 +91,7 @@ async function generateReport() {
     } else {
       if(score>=70){ status="✅ Confiável"; badgeClass="badge-safe"; }
       else if(score>=50){ status="⚠️ Risco Médio"; badgeClass="badge-medium"; }
-      else{ status="❓ Desconhecido / Informação limitada"; badgeClass="badge-medium"; }
+      else{ status="❓ Possível SCAM"; badgeClass="badge-warning"; }
     }
 
     // --- Meme aleatório ---
