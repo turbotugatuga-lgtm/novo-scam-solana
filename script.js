@@ -1,43 +1,42 @@
-const API_BASE = "https://SEU_BACKEND.onrender.com"; // troque pelo link do backend hospedado
+const memes = [
+  "https://i.imgflip.com/30zz5g.jpg",
+  "https://i.imgflip.com/4/1otk96.jpg",
+  "https://i.imgflip.com/65r2kq.jpg",
+  "https://i.imgflip.com/6c2p.jpg",
+  "https://i.imgflip.com/76j1a7.jpg"
+];
 
-async function generateReport() {
-  const mint = document.getElementById("mint").value.trim();
-  const reportDiv = document.getElementById("report");
-  reportDiv.innerHTML = "⏳ Gerando relatório Turbo Tuga Ultra Meme...";
+function getRandomItem(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
-  try {
-    const res = await fetch(`${API_BASE}/token/${mint}`);
-    const data = await res.json();
+function generateReport() {
+  const supply = (Math.random() * 1e9).toFixed(2);
+  const holders = Math.floor(Math.random() * 5000);
+  const score = Math.floor(Math.random() * 100);
+  const taxa = (Math.random() * 10).toFixed(2);
+  const queimado = (Math.random() * 1000000).toFixed(0);
+  const scamStatus = score < 40 ? "❌ Scam total 😂" : score < 70 ? "⚠️ Meio suspeito" : "✅ Confiável (só que não)";
+  
+  // 3 memes diferentes
+  const selectedMemes = Array.from({ length: 3 }, () => getRandomItem(memes));
 
-    // Top holders formatados
-    let holdersList = "N/A";
-    if (data.topHolders && data.topHolders.length > 0) {
-      holdersList = "<ul>" + data.topHolders.map(h =>
-        `<li>${h.owner} — ${h.percent.toFixed(2)}%</li>`
-      ).join("") + "</ul>";
-    }
+  const report = `
+    <h2>📊 Relatório Meme do Turbo Tuga</h2>
+    <p><strong>Status:</strong> ${scamStatus}</p>
+    <p><strong>Supply:</strong> ${supply}</p>
+    <p><strong>Holders:</strong> ${holders}</p>
+    <p><strong>Taxa de Venda:</strong> ${taxa}%</p>
+    <p><strong>Tokens Queimados:</strong> ${queimado}</p>
+    <p><strong>Score Total:</strong> ${score}/100</p>
 
-    reportDiv.innerHTML = `
-      <h2>📊 Relatório do Token</h2>
-      <p><b>Mint:</b> ${data.mint}</p>
-      <p><b>Nome:</b> ${data.name}</p>
-      <p><b>Símbolo:</b> ${data.symbol}</p>
-      <p><b>Supply:</b> ${data.supply}</p>
-      <p><b>Decimals:</b> ${data.decimals}</p>
-      <p><b>Mint Authority:</b> ${data.mintAuthority}</p>
-      <p><b>Freeze Authority:</b> ${data.freezeAuthority}</p>
-      <p><b>Preço (USDT):</b> ${data.price}</p>
-      <p><b>Liquidez:</b> ${data.liquidity}</p>
-      <p><b>Total de Holders:</b> ${data.holdersCount}</p>
-      <p><b>Top Holders:</b> ${holdersList}</p>
-      <br>
-      ⚠️ Este material é educativo — não é recomendação de compra/venda.
-      <br><br>
-      🐬 <a href="https://www.orca.so/?tokenIn=${mint}&tokenOut=So11111111111111111111111111111111111111112" target="_blank">Comprar no Orca</a>
-      🚀 <a href="https://jup.ag/swap?sell=${mint}&buy=So11111111111111111111111111111111111111112" target="_blank">Comprar no Jupiter</a>
-    `;
-  } catch (err) {
-    reportDiv.innerHTML = "❌ Erro ao gerar relatório.";
-    console.error(err);
-  }
+    <div class="meme-container">
+      ${selectedMemes.map(m => `<img src="${m}" alt="meme">`).join("")}
+    </div>
+
+    <p>🐬 Comprar Turbo Tuga em <a href="https://www.orca.so" target="_blank">DEX Orca</a> | 🚀 <a href="https://jup.ag" target="_blank">DEX Jupiter</a></p>
+    <p>⚠️ Este relatório é apenas um meme zoeiro. Não é recomendação de compra/venda.</p>
+  `;
+
+  document.getElementById("report").innerHTML = report;
 }
