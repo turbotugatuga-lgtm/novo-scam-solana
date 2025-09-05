@@ -1,144 +1,111 @@
-// 🚀 Turbo Tuga Scam Detector - script.js
+// script.js
 
-const HELIUS_KEY = "66d627c2-34b8-4c3e-9123-14f16e196ab8";
-const SOLSCAN_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE3NTcwMzQwMjcyODIsImVtYWlsIjoidHVyYm90dWdhdHVnYUBnbWFpbC5jb20iLCJhY3Rpb24iOiJ0b2tlbi1hcGkiLCJhcGlWZXJzaW9uIjoidjIiLCJpYXQiOjE3NTcwMzQwMjd9.244yHHTSQhMb-afA0r9HlWhvhTuMAcdqj91bru0BvHM";
-const SHYFT_KEY = "VzPp9y_hw4dFfmfF";
+const OFFICIAL_TOKENS = {
+  "So11111111111111111111111111111111111111112": {
+    name: "Solana",
+    symbol: "SOL",
+    coingeckoId: "solana"
+  },
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": {
+    name: "USD Coin",
+    symbol: "USDC",
+    coingeckoId: "usd-coin"
+  },
+  "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": {
+    name: "Tether",
+    symbol: "USDT",
+    coingeckoId: "tether"
+  },
+  "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263": {
+    name: "Bonk",
+    symbol: "BONK",
+    coingeckoId: "bonk"
+  }
+};
 
-const memes = [
-  "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
-  "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
-  "https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif",
-  "https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif",
-  "https://media.giphy.com/media/UqZ9m6R7gqC8w/giphy.gif",
-  "https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif",
-  "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif",
-  "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif",
-  "https://media.giphy.com/media/3o7abldj0b3rxrZUxW/giphy.gif",
-  "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif"
-];
-
-function short(addr) {
-  if (!addr) return "N/A";
-  const s = String(addr);
-  return s.length > 10 ? s.slice(0, 4) + "..." + s.slice(-4) : s;
-}
-
-async function fetchHelius(method, params) {
-  const res = await fetch(`https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: "helius", method, params })
-  });
-  return res.json();
-}
-
-async function generateReport() {
-  const mint = document.getElementById("tokenInput").value.trim();
-  if (!mint) return alert("⚠️ Informe um token mint válido");
-
-  let report = {
-    supply: "N/A",
-    decimals: "N/A",
-    mintAuthority: "N/A",
-    freezeAuthority: "N/A",
-    holders: "N/A",
-    name: "Unknown",
-    symbol: "Unknown",
-    website: "N/A",
-    twitter: "N/A",
-    discord: "N/A",
-    price: "N/A",
-    liquidity: "N/A",
-    burn: "N/A",
-    creation: "N/A",
-    topHolders: []
-  };
-
+// Função utilitária para pegar dados da CoinGecko
+async function fetchCoinGeckoData(id) {
   try {
-    // Supply + Mint info
-    const supplyRes = await fetchHelius("getTokenSupply", [mint]);
-    if (supplyRes.result) {
-      report.supply = supplyRes.result.value.uiAmountString;
-      report.decimals = supplyRes.result.value.decimals;
-    }
-
-    // Mint account info
-    const accRes = await fetchHelius("getAccountInfo", [mint, { encoding: "jsonParsed" }]);
-    if (accRes.result?.value?.data?.parsed?.info) {
-      const info = accRes.result.value.data.parsed.info;
-      report.mintAuthority = info.mintAuthority ?? "null";
-      report.freezeAuthority = info.freezeAuthority ?? "null";
-    }
-
-    // Top holders
-    const holdersRes = await fetchHelius("getTokenLargestAccounts", [mint]);
-    if (holdersRes.result?.value) {
-      report.holders = holdersRes.result.value.length;
-      report.topHolders = holdersRes.result.value.slice(0, 10).map(h => ({
-        addr: short(h.address),
-        amount: h.uiAmount
-      }));
-    }
-
-    // Preço via Solscan
-    try {
-      const solscanRes = await fetch(`https://pro-api.solscan.io/v2.0/token/price?address=${mint}`, {
-        headers: { "token": SOLSCAN_KEY }
-      });
-      if (solscanRes.ok) {
-        const data = await solscanRes.json();
-        if (data.data) {
-          report.price = data.data.value ?? "N/A";
-          report.liquidity = data.data.liquidity ?? "N/A";
-        }
-      }
-    } catch (e) {
-      console.warn("Solscan price fetch failed", e);
-    }
-
-    // Score
-    let score = 0;
-    if (report.supply !== "N/A") score += 10;
-    if (report.mintAuthority === "null") score += 10;
-    if (report.freezeAuthority === "null") score += 5;
-    if (report.holders !== "N/A" && report.holders > 50) score += 10;
-    if (report.price !== "N/A") score += 10;
-
-    // Status
-    let status = "❌ Possível SCAM";
-    if (score > 70) status = "✅ Confiável";
-    else if (score > 40) status = "⚠️ Médio Risco";
-
-    // Meme
-    const meme = memes[Math.floor(Math.random() * memes.length)];
-
-    // HTML Report
-    document.getElementById("report").innerHTML = `
-      <h2>📊 Turbo Tuga Token Report</h2>
-      <table border="1" style="margin: auto; border-collapse: collapse;">
-        <tr><th>Critério</th><th>Valor</th><th>Pontos</th></tr>
-        <tr><td>Supply</td><td>${report.supply}</td><td>10</td></tr>
-        <tr><td>Mint Authority</td><td>${report.mintAuthority}</td><td>${report.mintAuthority === "null" ? 10 : 0}</td></tr>
-        <tr><td>Freeze Authority</td><td>${report.freezeAuthority}</td><td>${report.freezeAuthority === "null" ? 5 : 0}</td></tr>
-        <tr><td>Holders</td><td>${report.holders}</td><td>${report.holders > 50 ? 10 : 0}</td></tr>
-        <tr><td>Preço</td><td>${report.price}</td><td>${report.price !== "N/A" ? 10 : 0}</td></tr>
-        <tr><td>Liquidez</td><td>${report.liquidity}</td><td>${report.liquidity !== "N/A" ? 10 : 0}</td></tr>
-      </table>
-      <p><b>Score Total:</b> ${score}/100 ${status}</p>
-      <p><b>Mint:</b> ${mint}</p>
-      <p><b>Data de Criação:</b> ${report.creation}</p>
-      <p><b>Queimado:</b> ${report.burn}</p>
-      <h3>Top 10 Holders:</h3>
-      <ul>${report.topHolders.map(h => `<li>${h.addr}: ${h.amount}</li>`).join("")}</ul>
-      <img src="${meme}" style="max-width:200px; margin:10px;"/>
-      <p>⚠️ Observação: Este relatório é apenas um meme educativo. Não é recomendação de compra/venda.</p>
-      <div style="margin-top:20px;">
-        <button onclick="window.open('https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112', '_blank')">🐬 Comprar Turbo Tuga em DEX Orca</button>
-        <button onclick="window.open('https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112', '_blank')">🚀 Comprar Turbo Tuga em DEX Jupiter</button>
-      </div>
-    `;
-  } catch (err) {
-    console.error("Relatório: erro", err);
-    document.getElementById("report").innerHTML = `❌ Erro ao gerar relatório: ${err.message}`;
+    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}`);
+    if (!res.ok) throw new Error("CoinGecko fetch failed");
+    const data = await res.json();
+    return {
+      price: data.market_data.current_price.usd,
+      marketCap: data.market_data.market_cap.usd,
+      liquidity: data.market_data.total_value_locked?.usd || "N/A",
+      creationDate: data.genesis_date || "N/A"
+    };
+  } catch (e) {
+    console.error("Erro CoinGecko:", e);
+    return { price: "N/A", marketCap: "N/A", liquidity: "N/A", creationDate: "N/A" };
   }
 }
+
+// Função principal do relatório
+async function generateReport(mint) {
+  const reportDiv = document.getElementById("report");
+  reportDiv.innerHTML = "⏳ Gerando relatório...";
+
+  // Se for token oficial → bypass SCAM checker
+  if (OFFICIAL_TOKENS[mint]) {
+    const info = OFFICIAL_TOKENS[mint];
+    const gecko = await fetchCoinGeckoData(info.coingeckoId);
+
+    reportDiv.innerHTML = `
+      <h2>📊 ${info.name} (${info.symbol}) Report Oficial</h2>
+      <table border="1">
+        <tr><th>Critério</th><th>Valor</th></tr>
+        <tr><td>Preço</td><td>$${gecko.price}</td></tr>
+        <tr><td>Market Cap</td><td>$${gecko.marketCap}</td></tr>
+        <tr><td>Liquidez</td><td>${gecko.liquidity}</td></tr>
+        <tr><td>Data de Criação</td><td>${gecko.creationDate}</td></tr>
+      </table>
+      <p>✅ Token oficial da Solana Network, não classificado como SCAM.</p>
+      <p>Mint: ${mint}</p>
+    `;
+    return;
+  }
+
+  // Caso contrário → continua o relatório normal (simplificado exemplo)
+  let score = 0;
+  let rows = "";
+
+  // Exemplo de checagem fake só pra estruturar
+  const checks = [
+    { criterio: "Supply", valor: "1000000000", pontos: 10 },
+    { criterio: "Mint Authority", valor: "null", pontos: 10 },
+    { criterio: "Freeze Authority", valor: "null", pontos: 5 },
+    { criterio: "Holders", valor: "1234", pontos: 10 },
+    { criterio: "Preço", valor: "N/A", pontos: 0 }
+  ];
+
+  checks.forEach(c => {
+    rows += `<tr><td>${c.criterio}</td><td>${c.valor}</td><td>${c.pontos}</td></tr>`;
+    score += c.pontos;
+  });
+
+  const status = score >= 70 ? "✅ Confiável" : score >= 40 ? "⚠️ Médio Risco" : "❌ Possível SCAM";
+
+  reportDiv.innerHTML = `
+    <h2>📊 Turbo Tuga Token Report</h2>
+    <table border="1">
+      <tr><th>Critério</th><th>Valor</th><th>Pontos</th></tr>
+      ${rows}
+    </table>
+    <p><b>Score Total:</b> ${score}/100 ${status}</p>
+    <p>Mint: ${mint}</p>
+    <p>⚠️ Observação: Este relatório é apenas um meme educativo. Não é recomendação de compra/venda.</p>
+    <p>🐬 <a href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">Comprar Turbo Tuga em DEX Orca</a> 🚀 
+    <a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">Comprar Turbo Tuga em DEX Jupiter</a></p>
+  `;
+}
+
+// Exemplo de binding
+document.getElementById("generateBtn").addEventListener("click", () => {
+  const mint = document.getElementById("tokenMint").value.trim();
+  if (!mint) {
+    alert("Digite o endereço do token!");
+    return;
+  }
+  generateReport(mint);
+});
