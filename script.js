@@ -1,80 +1,92 @@
-// Banco de memes/GIFs
-const memes = [
-  "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif", // rocket
-  "https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif", // chart explosion
-  "https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif", // dancing
-  "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif" // coin zoom
+// --- Meme & GIF banks ---
+const memesTop = [
+  "https://media.giphy.com/media/3o7TKtnuHOHHUjR38Y/giphy.gif",
+  "https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif",
+  "https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif",
+  // ... adicione até 100 memes/GIFs
 ];
 
-// Banco de frases meme
+const memesBottom = [
+  "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif",
+  "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+  "https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif",
+  // ... adicione até 100 memes/GIFs
+];
+
 const phrases = {
-  supply: ["🤔 Weird supply… clown alert!", "📈 Supply is off the charts!", "😂 Tiny supply, like my savings."],
-  burned: ["🔥 Burned more than my pizza last night!", "💨 Tokens disappearing… poof!", "🔥 Burn baby burn!"],
-  holders: ["👀 Only a few people holding this.", "🙃 Missing holders… nobody attended.", "🐢 Slow holders, barely moving."],
-  price: ["💸 Price mooning?", "💰 Cheap as a candy bar!", "📉 Price dropping like my motivation."],
-  locked: ["🔒 Token locked? Security first!", "🚫 No selling allowed!", "🛑 Blocked, sad times!"],
-  revoked: ["⚠️ Admin revoked! Chaos!", "😱 No more authority!", "🤯 Total power gone!"],
-  fee: ["💸 Taxed heavily!", "😂 Tiny tax, huge laughs!", "💰 Watch out for fees!"],
-  whales: ["🐋 Whale spotted!", "🦈 Huge holder incoming!", "🐟 Sardine gang!"]
+  supply: [
+    "This coin has more supply than my patience 🚀",
+    "Supply looks fishy... 🐟",
+    "Too much supply, not enough sense 😅"
+  ],
+  holders: [
+    "Top holders are basically whales 🐋",
+    "Everyone else is just a sardine 🐟",
+    "Holders concentrated like a rocket crew 👨‍🚀"
+  ],
+  price: [
+    "Price went to the moon 🌕 or crashed 💥",
+    "Looks like someone spilled rocket fuel 🚀",
+    "Price is hotter than my coffee ☕"
+  ],
+  tax: [
+    "Someone’s sneaky with fees 😏",
+    "Taxed like crazy! 💸",
+    "Trading here might sting 🐝"
+  ]
+  // ... pode expandir para 50+ frases por campo
 };
 
-// Função helper para sortear
-function randomItem(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+// --- Função de relatório ---
+function generateReport() {
+  const tokenMint = document.getElementById("tokenInput").value.trim();
+  if(!tokenMint) return alert("Enter a valid token mint address!");
+
+  const topMeme = memesTop[Math.floor(Math.random()*memesTop.length)];
+  const bottomMeme = memesBottom[Math.floor(Math.random()*memesBottom.length)];
+
+  // Fake data generator para meme/animação
+  const supply = (Math.random()*1e9).toFixed(2);
+  const holders = Math.floor(Math.random()*500);
+  const price = (Math.random()*10).toFixed(2);
+  const score = Math.floor(Math.random()*100);
+  const status = score>70?"✅ Trustworthy":score>30?"⚠️ Medium Risk":"❌ Possible SCAM";
+
+  const phraseSupply = phrases.supply[Math.floor(Math.random()*phrases.supply.length)];
+  const phraseHolders = phrases.holders[Math.floor(Math.random()*phrases.holders.length)];
+  const phrasePrice = phrases.price[Math.floor(Math.random()*phrases.price.length)];
+  const phraseTax = phrases.tax[Math.floor(Math.random()*phrases.tax.length)];
+
+  document.getElementById("report").innerHTML = `
+    <img src="${topMeme}" alt="Top Meme" />
+    <h2>📊 Turbo Tuga Token Report</h2>
+    <p><b>Status:</b> ${status}</p>
+    <p><b>Token Mint:</b> ${tokenMint}</p>
+    <p><b>Supply:</b> ${supply} | ${phraseSupply}</p>
+    <p><b>Holders:</b> ${holders} | ${phraseHolders}</p>
+    <p><b>Price:</b> $${price} | ${phrasePrice}</p>
+    <p><b>Tax / Fees:</b> ${phraseTax}</p>
+    <p>⚠️ This material is educational — not investment advice.</p>
+    <div style="margin-top:10px;">
+      <button onclick="shareTwitter()">🐦 Share on Twitter</button>
+      <button onclick="shareTelegram()">📢 Share on Telegram</button>
+      <button onclick="exportPDF()">📄 Export PDF</button>
+    </div>
+    <img src="${bottomMeme}" alt="Bottom Meme" />
+  `;
 }
 
-function generateReport() {
-  const token = document.getElementById("tokenMint").value.trim();
-  if(!token) {
-    alert("Please enter a token mint!");
-    return;
-  }
+// --- Compartilhamento ---
+function shareTwitter(){
+  const text = document.getElementById("report").innerText;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
+}
+function shareTelegram(){
+  const text = document.getElementById("report").innerText;
+  window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(text)}`, "_blank");
+}
 
-  const reportDiv = document.getElementById("report");
-  reportDiv.innerHTML = `<p>⏳ Generating Turbo Tuga Ultra Meme report for <b>${token}</b>...</p>`;
-
-  // Simula delay como se estivesse puxando dados
-  setTimeout(() => {
-    // Gerar dados fake/divertidos
-    const supply = (Math.random()*1000000).toFixed(2);
-    const holders = Math.floor(Math.random()*500);
-    const burned = (Math.random()*50000).toFixed(0);
-    const price = (Math.random()*5).toFixed(2);
-    const locked = Math.random()>0.7 ? "Yes" : "No";
-    const revoked = Math.random()>0.8 ? "Yes" : "No";
-    const fee = Math.floor(Math.random()*20);
-    const whales = Math.floor(Math.random()*3);
-
-    // Pega 2 memes aleatórios
-    let meme1 = randomItem(memes);
-    let meme2 = randomItem(memes);
-    while(meme2 === meme1) meme2 = randomItem(memes);
-
-    // Monta relatório HTML
-    reportDiv.innerHTML = `
-      <h2>📊 Turbo Tuga Meme Report</h2>
-      <p>Token: <b>${token}</b></p>
-
-      <p>Supply: ${supply} <br> <i>${randomItem(phrases.supply)}</i></p>
-      <p>Burned: ${burned} <br> <i>${randomItem(phrases.burned)}</i></p>
-      <p>Holders: ${holders} <br> <i>${randomItem(phrases.holders)}</i></p>
-      <p>Price: $${price} <br> <i>${randomItem(phrases.price)}</i></p>
-      <p>Locked: ${locked} <br> <i>${randomItem(phrases.locked)}</i></p>
-      <p>Admin Revoked: ${revoked} <br> <i>${randomItem(phrases.revoked)}</i></p>
-      <p>Fee: ${fee}% <br> <i>${randomItem(phrases.fee)}</i></p>
-      <p>Whales: ${whales} <br> <i>${randomItem(phrases.whales)}</i></p>
-
-      <div class="memes">
-        <img src="${meme1}" width="200" style="margin:10px;">
-        <img src="${meme2}" width="200" style="margin:10px;">
-      </div>
-
-      <p>⚠️ This material is educational only — not financial advice.</p>
-
-      <div class="buy-buttons">
-        <a href="https://www.orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">🐬 Buy Turbo Tuga on Orca</a>
-        <a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">🚀 Buy Turbo Tuga on Jupiter</a>
-      </div>
-    `;
-  }, 1200);
+// --- PDF export (simples) ---
+function exportPDF() {
+  alert("PDF export feature is in development 😎");
 }
