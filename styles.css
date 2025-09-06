@@ -1,7 +1,12 @@
+@font-face {
+    font-family: 'ComicSansMS';
+    src: url('fonts/ComicSansMS.ttf') format('truetype');
+}
+
 body {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-family: 'ComicSansMS', cursive, sans-serif;
     background: url('memes/rocket.gif') no-repeat center top;
-    background-size: contain;
+    background-size: cover;
     color: #fff;
     text-align: center;
     margin: 0;
@@ -10,11 +15,10 @@ body {
 
 .container {
     max-width: 900px;
-    margin: auto;
+    margin: 50px auto;
     padding: 20px;
     background: rgba(0,0,0,0.7);
     border-radius: 15px;
-    margin-top: 50px;
 }
 
 input {
@@ -42,10 +46,11 @@ button {
     background: rgba(0,0,0,0.9);
     padding: 20px;
     border-radius: 15px;
+    min-height: 300px;
 }
 
 #reportSection img {
-    max-width: 150px;
+    max-width: 200px;
     margin: 10px;
     border-radius: 10px;
 }
