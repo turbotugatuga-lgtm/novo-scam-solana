@@ -1,84 +1,73 @@
 body {
-    margin: 0;
-    font-family: 'Comic Sans MS', sans-serif;
-    background: url('https://i.ibb.co/7vKf0F1/crypto-bg.jpg') no-repeat center center fixed;
-    background-size: cover;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: url('background-meme.png') center top/cover no-repeat;
     color: #fff;
-}
-
-header {
     text-align: center;
-    padding: 20px;
-    background: rgba(0,0,0,0.6);
+    margin: 0;
+    padding: 0;
 }
 
-.meme-warning {
-    font-size: 1rem;
-    color: #ffcc00;
-}
-
-.input-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 20px;
-    flex-wrap: wrap;
-}
-
-input[type="text"] {
-    padding: 10px;
-    font-size: 1rem;
-    width: 250px;
-    border-radius: 8px;
-    border: none;
-}
-
-button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: none;
-    background-color: #ff9900;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-button:hover {
-    background-color: #ffcc00;
-}
-
-.report-container {
-    margin: 20px auto;
-    padding: 20px;
-    width: 90%;
+.container {
     max-width: 900px;
-    background: rgba(0,0,0,0.7);
-    border-radius: 15px;
-    box-shadow: 0 0 20px #000;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(0,0,0,0.6);
+    border-radius: 20px;
 }
 
-.buy-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin: 20px;
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #ffdd00;
+    text-shadow: 2px 2px #000;
+}
+
+header p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.input-section input {
+    padding: 10px;
+    margin: 5px;
+    width: 40%;
+    border-radius: 10px;
+    border: none;
+}
+
+.input-section button {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #ff8800;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.input-section button:hover {
+    background-color: #ffaa33;
+}
+
+.report-section {
+    margin-top: 20px;
+    text-align: left;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 15px;
 }
 
 .buy-buttons a {
-    padding: 10px 20px;
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 15px;
     background-color: #00ccff;
-    border-radius: 10px;
     color: #000;
     text-decoration: none;
+    border-radius: 10px;
     font-weight: bold;
 }
 
 .buy-buttons a:hover {
-    background-color: #00ffee;
-}
-
-footer {
-    text-align: center;
-    padding: 20px;
-    background: rgba(0,0,0,0.6);
+    background-color: #33eeff;
 }
