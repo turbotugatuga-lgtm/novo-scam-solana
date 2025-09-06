@@ -1,44 +1,55 @@
-// ----------------- Meme Bank -----------------
+// ----------------- Meme/GIF Bank -----------------
 const memes = [
     "memes/rocket.gif",
-    "memes/chart.png",
-    "memes/whale.png",
+    "memes/chart.gif",
+    "memes/whale.gif",
     "memes/moon.gif",
     "memes/explosion.gif"
-    // adicione mais de 100 gifs/imagens
+    // Adicione mais memes/gifs (100+) aqui
 ];
 
 // ----------------- Phrase Bank -----------------
 const phrases = {
     supply: [
-        "Infinite supply? Who cares!", "Supply exploded! 🔥", "Nothing left, LOL", "Supply is secret 🤫", "All burned but safe!"
+        "Infinite supply? Who cares!", "Supply exploded! 🔥", "Nothing left, LOL", 
+        "Supply is secret 🤫", "All burned but safe!"
     ],
     burned: [
-        "Tokens disappeared, meme remains.", "Burned faster than pizza!", "Nothing burned, all safe!", "Burned for fun!", "Oops burned!"
+        "Tokens disappeared, meme remains.", "Burned faster than pizza!", 
+        "Nothing burned, all safe!", "Burned for fun!", "Oops burned!"
     ],
     holders: [
-        "Holders like a small town, everyone knows everyone.", "Just 3 whales holding everything!", "Everyone has some tokens!", "Holders hiding 🕵️", "Top 3 own 90%!"
+        "Holders like a small town, everyone knows everyone.", 
+        "Just 3 whales holding everything!", "Everyone has some tokens!", 
+        "Holders hiding 🕵️", "Top 3 own 90%!"
     ],
     price: [
-        "Price? LOL, we only go up!", "Down? No worries!", "Moon incoming!", "Price is meme!", "Priceless!"
+        "Price? LOL, we only go up!", "Down? No worries!", "Moon incoming!", 
+        "Price is meme!", "Priceless!"
     ],
     locked: [
-        "Locked? Perfect, more chaos!", "Free to sell, maybe...", "Token jail activated.", "Locked tight!", "No escape!"
+        "Locked? Perfect, more chaos!", "Free to sell, maybe...", "Token jail activated.", 
+        "Locked tight!", "No escape!"
     ],
     revoked: [
-        "Revoked? Admin ninja moves.", "All good, nothing revoked.", "Oops, revoked!", "Admin revoked? LOL", "Revoked like a boss!"
+        "Revoked? Admin ninja moves.", "All good, nothing revoked.", "Oops, revoked!", 
+        "Admin revoked? LOL", "Revoked like a boss!"
     ],
     whale: [
-        "Whales hiding!", "Whale splashes!", "Whale just sneezed!", "Whale dancing!", "Whale alert!"
+        "Whales hiding!", "Whale splashes!", "Whale just sneezed!", "Whale dancing!", 
+        "Whale alert!"
     ],
     marketCap: [
-        "Infinite, if you squint.", "Market cap skyrocketing!", "Tiny but mighty.", "Huge cap LOL", "Market exploding!"
+        "Infinite, if you squint.", "Market cap skyrocketing!", "Tiny but mighty.", 
+        "Huge cap LOL", "Market exploding!"
     ],
     topHolder: [
-        "Top holder is a legend!", "Someone owns 50%!", "Top 3 holding 90%!", "Whale power!", "Top 5 are gods!"
+        "Top holder is a legend!", "Someone owns 50%!", "Top 3 holding 90%!", 
+        "Whale power!", "Top 5 are gods!"
     ],
     transactions: [
-        "Lots of trades today!", "Quiet day in crypto.", "Meme trades only!", "Transactions everywhere!", "Trading frenzy!"
+        "Lots of trades today!", "Quiet day in crypto.", "Meme trades only!", 
+        "Transactions everywhere!", "Trading frenzy!"
     ]
 };
 
@@ -47,7 +58,7 @@ function randomFromArray(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// ----------------- Generate Report -----------------
+// ----------------- Generate Meme Report -----------------
 function generateReport() {
     const tokenCode = document.getElementById('tokenCode').value.trim();
     const tokenName = document.getElementById('tokenName').value.trim() || "Unknown";
@@ -59,7 +70,7 @@ function generateReport() {
 
     const reportSection = document.getElementById('reportSection');
 
-    // Selecionar 5 a 6 campos aleatórios
+    // Selecionar 5-6 campos aleatórios
     const fields = Object.keys(phrases);
     const selectedFields = [];
     while (selectedFields.length < 6) {
