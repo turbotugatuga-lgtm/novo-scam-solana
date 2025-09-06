@@ -3,84 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <title>Turbo Tuga Ultra Meme Analyzer</title>
-<style>
-body { font-family: Arial; background:#111; color:#fff; text-align:center; }
-input { padding:5px; margin:5px; width:300px; }
-button { padding:10px 20px; margin:10px; font-size:1rem; cursor:pointer; }
-#reportSection { margin-top:20px; background: rgba(0,0,0,0.7); padding:20px; border-radius:10px; }
-.buy-buttons a { margin: 5px; display:inline-block; padding:5px 10px; background:#ffcc00; color:#000; border-radius:5px; text-decoration:none; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="container">
+    <h1>Turbo Tuga Ultra Meme Analyzer</h1>
+    <p class="subtitle">Enter your token code and get a fun meme report! 🚀</p>
+    
+    <input id="tokenCode" placeholder="Enter Token Code (e.g., 9QLR3W...)">
+    <input id="tokenName" placeholder="Enter Token Name (optional)">
+    <button id="generateBtn">Generate Report</button>
 
-<h1>Turbo Tuga Ultra Meme Analyzer</h1>
-<input id="tokenCode" placeholder="Enter Token Code (e.g., 9QLR3W...)">
-<input id="tokenName" placeholder="Enter Token Name (optional)">
-<button onclick="generateReport()">Generate Report</button>
+    <div id="reportSection"></div>
+</div>
 
-<div id="reportSection"></div>
-
-<script>
-// Banco de memes (exemplo)
-const memes = ["🚀 To the moon!", "💥 Boom goes the token!", "🐳 Whale spotted!"];
-
-// Banco de frases para cada campo
-const phrases = {
-    supply: ["Infinite supply? Who cares!", "Supply exploded! 🔥", "Nothing left, LOL"],
-    burned: ["Tokens disappeared, meme remains.", "Burned faster than pizza!", "Nothing burned, all safe!"],
-    holders: ["Holders like a small town, everyone knows everyone.", "Just 3 whales holding everything!", "Everyone and their grandma holds some."],
-    price: ["Price? LOL, we only go up!", "Down? No worries!", "Moon incoming!"],
-    locked: ["Locked? Perfect, more chaos!", "Free to sell, maybe...", "Token jail activated."],
-    revoked: ["Revoked? Admin ninja moves.", "All good, nothing revoked.", "Oops, revoked!"],
-    whale: ["Whales hiding!", "Whale splashes!", "Whale just sneezed!"],
-    marketCap: ["Infinite, if you squint.", "Market cap skyrocketing!", "Tiny but mighty."],
-    topHolder: ["Top holder is a legend!", "Someone owns 50%!", "Top 3 holding 90%!"],
-    transactions: ["Lots of trades today!", "Quiet day in crypto.", "Meme trades only!"]
-};
-
-function randomFromArray(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function generateReport() {
-    const tokenCode = document.getElementById('tokenCode').value.trim();
-    const tokenName = document.getElementById('tokenName').value.trim() || "Unknown";
-
-    if (!tokenCode) {
-        alert("Please enter a token code!");
-        return;
-    }
-
-    const reportSection = document.getElementById('reportSection');
-
-    const fields = Object.keys(phrases);
-    const selectedFields = [];
-    while (selectedFields.length < 5) {
-        const f = randomFromArray(fields);
-        if (!selectedFields.includes(f)) selectedFields.push(f);
-    }
-
-    const meme = randomFromArray(memes);
-
-    let reportHTML = `<h2>Meme Report for ${tokenName} (${tokenCode})</h2>`;
-    reportHTML += `<p style="color:#ffcc00;">This is a fun meme report for entertainment only — not financial advice!</p>`;
-    reportHTML += `<div style="font-size:2rem; margin:15px;">${meme}</div>`;
-    reportHTML += `<ul>`;
-    selectedFields.forEach(f => {
-        const phrase = randomFromArray(phrases[f]);
-        reportHTML += `<li><strong>${f.toUpperCase()}:</strong> ${phrase}</li>`;
-    });
-    reportHTML += `</ul>`;
-
-    // Botões de compra
-    reportHTML += `<div class="buy-buttons">
-        <a href="https://orca.so/?tokenIn=${tokenCode}&tokenOut=So11111111111111111111111111111111111111112" target="_blank">🐬 Buy Turbo Tuga on Orca</a>
-        <a href="https://jup.ag/swap?sell=${tokenCode}&buy=So11111111111111111111111111111111111111112" target="_blank">🪐 Buy Turbo Tuga on Jupiter</a>
-    </div>`;
-
-    reportSection.innerHTML = reportHTML;
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
+
