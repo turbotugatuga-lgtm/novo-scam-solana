@@ -1,6 +1,7 @@
 body {
     font-family: 'Comic Sans MS', cursive, sans-serif;
-    background: url('background-meme.png') center top/cover no-repeat;
+    background: url('memes/rocket.gif') no-repeat center top;
+    background-size: contain;
     color: #fff;
     text-align: center;
     margin: 0;
@@ -9,65 +10,53 @@ body {
 
 .container {
     max-width: 900px;
-    margin: 0 auto;
+    margin: auto;
     padding: 20px;
-    background-color: rgba(0,0,0,0.6);
-    border-radius: 20px;
-}
-
-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    color: #ffdd00;
-    text-shadow: 2px 2px #000;
-}
-
-header p {
-    font-size: 1rem;
-    margin-bottom: 20px;
-}
-
-.input-section input {
-    padding: 10px;
-    margin: 5px;
-    width: 40%;
-    border-radius: 10px;
-    border: none;
-}
-
-.input-section button {
-    padding: 10px 20px;
-    margin: 5px;
-    background-color: #ff8800;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.input-section button:hover {
-    background-color: #ffaa33;
-}
-
-.report-section {
-    margin-top: 20px;
-    text-align: left;
-    padding: 20px;
-    background-color: rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.7);
     border-radius: 15px;
+    margin-top: 50px;
 }
 
-.buy-buttons a {
-    display: inline-block;
+input {
+    padding: 10px;
     margin: 10px;
-    padding: 10px 15px;
-    background-color: #00ccff;
+    width: 300px;
+    border-radius: 5px;
+    border: none;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #ffcc00;
     color: #000;
-    text-decoration: none;
-    border-radius: 10px;
     font-weight: bold;
 }
 
-.buy-buttons a:hover {
-    background-color: #33eeff;
+#reportSection {
+    margin-top: 30px;
+    background: rgba(0,0,0,0.9);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+#reportSection img {
+    max-width: 150px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+.buy-buttons a {
+    margin: 5px;
+    display: inline-block;
+    padding: 10px 15px;
+    background: #ffcc00;
+    color: #000;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
 }
