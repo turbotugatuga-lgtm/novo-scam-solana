@@ -1,105 +1,86 @@
-// ----------------- Meme/GIF Bank -----------------
-const memes = [
-    "memes/rocket.gif",
-    "memes/chart.gif",
-    "memes/whale.gif",
-    "memes/moon.gif",
-    "memes/explosion.gif"
-    // Adicione mais memes/gifs (100+) aqui
+const generateBtn = document.getElementById("generateBtn");
+const reportContainer = document.getElementById("reportContainer");
+
+// Meme banks
+const memesTop = [
+    '🚀 Turbo Tuga going to the moon!',
+    '💥 Exploding meme coins!',
+    '🐬 HODL like a dolphin!',
+    '📈 Charts going straight up!'
+];
+const memesBottom = [
+    '🌕 Moon mission continues!',
+    '💸 Whale alert!',
+    '🤣 Just a meme report, relax!',
+    '🔥 Price is totally random!'
 ];
 
-// ----------------- Phrase Bank -----------------
+// Phrases for each report field
 const phrases = {
     supply: [
-        "Infinite supply? Who cares!", "Supply exploded! 🔥", "Nothing left, LOL", 
-        "Supply is secret 🤫", "All burned but safe!"
+        "🐳 A whale just sneezed, market crashed!",
+        "🪐 Supply looks weird, but who cares?",
+        "💨 Token evaporated into the void."
     ],
     burned: [
-        "Tokens disappeared, meme remains.", "Burned faster than pizza!", 
-        "Nothing burned, all safe!", "Burned for fun!", "Oops burned!"
+        "🔥 Burned like my hopes!",
+        "💣 Whoops, someone sent coins to Mars!",
+        "📉 Daily transactions? LOL, just your mom buying."
     ],
     holders: [
-        "Holders like a small town, everyone knows everyone.", 
-        "Just 3 whales holding everything!", "Everyone has some tokens!", 
-        "Holders hiding 🕵️", "Top 3 own 90%!"
+        "💸 Taxed like crazy, moon soon!",
+        "🐟 Sardines everywhere, whales hiding.",
+        "😎 Hold tight, diamond hands!"
     ],
     price: [
-        "Price? LOL, we only go up!", "Down? No worries!", "Moon incoming!", 
-        "Price is meme!", "Priceless!"
+        "🚨 Price unknown, panic or profit?",
+        "💥 Revoked admin? Perfect, more chaos.",
+        "📊 Chart says: Who knows!"
     ],
     locked: [
-        "Locked? Perfect, more chaos!", "Free to sell, maybe...", "Token jail activated.", 
-        "Locked tight!", "No escape!"
-    ],
-    revoked: [
-        "Revoked? Admin ninja moves.", "All good, nothing revoked.", "Oops, revoked!", 
-        "Admin revoked? LOL", "Revoked like a boss!"
-    ],
-    whale: [
-        "Whales hiding!", "Whale splashes!", "Whale just sneezed!", "Whale dancing!", 
-        "Whale alert!"
-    ],
-    marketCap: [
-        "Infinite, if you squint.", "Market cap skyrocketing!", "Tiny but mighty.", 
-        "Huge cap LOL", "Market exploding!"
-    ],
-    topHolder: [
-        "Top holder is a legend!", "Someone owns 50%!", "Top 3 holding 90%!", 
-        "Whale power!", "Top 5 are gods!"
-    ],
-    transactions: [
-        "Lots of trades today!", "Quiet day in crypto.", "Meme trades only!", 
-        "Transactions everywhere!", "Trading frenzy!"
+        "🔒 Locked until the end of time.",
+        "🌕 Market cap? Infinite, maybe.",
+        "⛓️ Can't sell, but you can dream!"
     ]
 };
 
-// ----------------- Helpers -----------------
-function randomFromArray(arr) {
+// Utility function
+function randomElement(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// ----------------- Generate Meme Report -----------------
-function generateReport() {
-    const tokenCode = document.getElementById('tokenCode').value.trim();
-    const tokenName = document.getElementById('tokenName').value.trim() || "Unknown";
+// Generate Meme Report
+generateBtn.onclick = function() {
+    const tokenCode = document.getElementById("tokenCode").value || "Unknown";
+    const tokenName = document.getElementById("tokenName").value || "Turbo Tuga";
 
-    if (!tokenCode) {
+    if(!tokenCode) {
         alert("Please enter a token code!");
         return;
     }
 
-    const reportSection = document.getElementById('reportSection');
+    const topMeme = randomElement(memesTop);
+    const bottomMeme = randomElement(memesBottom);
 
-    // Selecionar 5-6 campos aleatórios
-    const fields = Object.keys(phrases);
-    const selectedFields = [];
-    while (selectedFields.length < 6) {
-        const f = randomFromArray(fields);
-        if (!selectedFields.includes(f)) selectedFields.push(f);
-    }
+    reportContainer.innerHTML = `
+        <h2>${tokenName} Meme Report</h2>
+        <p class="report-warning">⚠️ This is a FUN meme report! Not real financial advice. ⚠️</p>
+        <p><strong>Token:</strong> ${tokenName} — ${tokenCode}</p>
+        <ul>
+            <li><strong>Supply:</strong> ${randomElement(phrases.supply)}</li>
+            <li><strong>Burned Tokens:</strong> ${randomElement(phrases.burned)}</li>
+            <li><strong>Holders:</strong> ${randomElement(phrases.holders)}</li>
+            <li><strong>Price:</strong> ${randomElement(phrases.price)}</li>
+            <li><strong>Locked:</strong> ${randomElement(phrases.locked)}</li>
+        </ul>
+        <div class="meme-top">${topMeme}</div>
+        <div class="meme-bottom">${bottomMeme}</div>
+        <div class="buy-buttons">
+            <a href="https://orca.so/?tokenIn=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&tokenOut=So11111111111111111111111111111111111111112" target="_blank">Buy Turbo Tuga on Orca 🐬</a>
+            <a href="https://jup.ag/swap?sell=9QLR3WrENnBGsv6kL33d4kDHvak71k2hBvKbHgEDwQtQ&buy=So11111111111111111111111111111111111111112" target="_blank">Buy Turbo Tuga on Jupiter 🪐</a>
+        </div>
+    `;
 
-    // Selecionar 1 meme
-    const selectedMeme = randomFromArray(memes);
-
-    // Gerar HTML do relatório
-    let reportHTML = `<h2>Meme Report for ${tokenName} (${tokenCode})</h2>`;
-    reportHTML += `<p style="color:#ffcc00;">This is a fun meme report for entertainment only — not financial advice!</p>`;
-    reportHTML += `<div><img src="${selectedMeme}" alt="meme"></div>`;
-    reportHTML += `<ul>`;
-    selectedFields.forEach(f => {
-        const phrase = randomFromArray(phrases[f]);
-        reportHTML += `<li><strong>${f.toUpperCase()}:</strong> ${phrase}</li>`;
-    });
-    reportHTML += `</ul>`;
-
-    // Botões de compra
-    reportHTML += `<div class="buy-buttons">
-        <a href="https://orca.so/?tokenIn=${tokenCode}&tokenOut=So11111111111111111111111111111111111111112" target="_blank">🐬 Buy Turbo Tuga on Orca</a>
-        <a href="https://jup.ag/swap?sell=${tokenCode}&buy=So11111111111111111111111111111111111111112" target="_blank">🪐 Buy Turbo Tuga on Jupiter</a>
-    </div>`;
-
-    reportSection.innerHTML = reportHTML;
-}
-
-// ----------------- Event Listener -----------------
-document.getElementById("generateBtn").addEventListener("click", generateReport);
+    // Optional: Export PDF (using html2pdf.js or similar)
+    // Optional: Social share (Twitter / Telegram)
+};
